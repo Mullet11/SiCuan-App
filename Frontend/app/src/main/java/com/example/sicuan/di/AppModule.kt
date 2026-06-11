@@ -12,6 +12,14 @@ import com.example.sicuan.domain.usecase.transaction.GetTotalAmountByTypeUseCase
 import com.example.sicuan.domain.usecase.transaction.GetTransactionByIdUseCase
 import com.example.sicuan.domain.usecase.transaction.TransactionUseCases
 import com.example.sicuan.domain.usecase.transaction.UpdateTransactionUseCase
+import com.example.sicuan.data.repository.BudgetRepositoryImpl
+import com.example.sicuan.domain.repository.BudgetRepository
+import com.example.sicuan.domain.usecase.budget.AddBudgetUseCase
+import com.example.sicuan.domain.usecase.budget.BudgetUseCases
+import com.example.sicuan.domain.usecase.budget.DeleteBudgetUseCase
+import com.example.sicuan.domain.usecase.budget.GetAllBudgetsUseCase
+import com.example.sicuan.domain.usecase.budget.GetBudgetByIdUseCase
+import com.example.sicuan.domain.usecase.budget.UpdateBudgetUseCase
 
 object AppModule {
 
@@ -38,6 +46,26 @@ object AppModule {
             deleteTransaction = DeleteTransactionUseCase(repository),
             getTotalAmountByType = GetTotalAmountByTypeUseCase(repository),
             getRecentTransactions = GetRecentTransactionsUseCase(repository)
+        )
+    }
+
+    fun provideBudgetRepository(context: Context): BudgetRepository {
+        val database = provideDatabase(context)
+
+        return BudgetRepositoryImpl(
+            budgetDao = database.budgetDao()
+        )
+    }
+
+    fun provideBudgetUseCases(context: Context): BudgetUseCases {
+        val repository = provideBudgetRepository(context)
+
+        return BudgetUseCases(
+            getAllBudgets = GetAllBudgetsUseCase(repository),
+            getBudgetById = GetBudgetByIdUseCase(repository),
+            addBudget = AddBudgetUseCase(repository),
+            updateBudget = UpdateBudgetUseCase(repository),
+            deleteBudget = DeleteBudgetUseCase(repository)
         )
     }
 }

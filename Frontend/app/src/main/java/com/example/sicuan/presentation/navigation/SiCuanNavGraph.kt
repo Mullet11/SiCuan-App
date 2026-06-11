@@ -24,6 +24,8 @@ import com.example.sicuan.presentation.screen.transaction.TransactionListScreen
 import com.example.sicuan.di.AppModule
 import com.example.sicuan.presentation.viewmodel.TransactionViewModel
 import com.example.sicuan.presentation.viewmodel.TransactionViewModelFactory
+import com.example.sicuan.presentation.viewmodel.BudgetViewModel
+import com.example.sicuan.presentation.viewmodel.BudgetViewModelFactory
 
 @Composable
 fun SiCuanNavGraph() {
@@ -40,6 +42,16 @@ fun SiCuanNavGraph() {
 
     val transactionUiState by transactionViewModel.uiState.collectAsState()
     val selectedTransaction by transactionViewModel.selectedTransaction.collectAsState()
+
+    val budgetUseCases = remember {
+        AppModule.provideBudgetUseCases(context)
+    }
+
+    val budgetViewModel: BudgetViewModel = viewModel(
+        factory = BudgetViewModelFactory(budgetUseCases)
+    )
+
+    val budgetUiState by budgetViewModel.uiState.collectAsState()
 
     NavHost(
         navController = navController,
@@ -206,7 +218,36 @@ fun SiCuanNavGraph() {
         }
 
         composable(Screen.Budget.route) {
-            BudgetScreen()
+            BudgetScreen(
+                budgets = budgetUiState.budgets,
+                transactions = transactionUiState.transactions,
+                isLoading = budgetUiState.isLoading,
+                errorMessage = budgetUiState.errorMessage,
+                successMessage = budgetUiState.successMessage,
+                onClearMessage = {
+                    budgetViewModel.clearMessage()
+                },
+                onAddBudget = { category, limitAmount ->
+                    budgetViewModel.addBudget(
+                        category = category,
+                        limitAmountText = limitAmount
+                    )
+                },
+                onUpdateBudget = { budgetId, category, limitAmount ->
+                    budgetViewModel.updateBudget(
+                        budgetId = budgetId,
+                        category = category,
+                        limitAmountText = limitAmount
+                    )
+                },
+                onDeleteBudget = { budgetId ->
+                    budgetViewModel.deleteBudget(budgetId)
+                },
+                onBack = {
+                    budgetViewModel.clearMessage()
+                    navController.popBackStack()
+                }
+            )
         }
 
         composable(Screen.Insight.route) {
