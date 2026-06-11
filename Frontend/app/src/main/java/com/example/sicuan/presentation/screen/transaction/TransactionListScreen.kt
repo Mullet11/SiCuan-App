@@ -11,21 +11,22 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.example.sicuan.domain.model.Transaction
+import com.example.sicuan.domain.model.TransactionType
 import com.example.sicuan.presentation.component.SiCuanCard
 import com.example.sicuan.presentation.component.SiCuanPrimaryButton
 import com.example.sicuan.ui.theme.SiCuanDimens
+import java.text.NumberFormat
+import java.util.Locale
 
 @Composable
 fun TransactionListScreen(
+    transactions: List<Transaction>,
+    isLoading: Boolean,
+    errorMessage: String?,
     onNavigateToAddTransaction: () -> Unit,
     onNavigateToDetailTransaction: (Int) -> Unit
 ) {
-    val dummyTransactions = listOf(
-        1 to "Makan siang - Rp15.000",
-        2 to "Print tugas - Rp5.000",
-        3 to "Uang masuk - Rp100.000"
-    )
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -43,26 +44,117 @@ fun TransactionListScreen(
             onClick = onNavigateToAddTransaction
         )
 
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(SiCuanDimens.SpacingSm)
-        ) {
-            items(dummyTransactions) { transaction ->
-                SiCuanCard(
-                    modifier = Modifier.clickable {
-                        onNavigateToDetailTransaction(transaction.first)
-                    }
-                ) {
+        when {
+            isLoading -> {
+                Text(
+                    text = "Memuat transaksi...",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            }
+
+            errorMessage != null -> {
+                Text(
+                    text = errorMessage,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+
+            transactions.isEmpty() -> {
+                SiCuanCard {
                     Text(
-                        text = transaction.second,
-                        style = MaterialTheme.typography.bodyLarge
+                        text = "Belum ada transaksi.",
+                        style = MaterialTheme.typography.titleMedium
                     )
 
                     Text(
-                        text = "Klik untuk melihat detail",
+                        text = "Tekan tombol Tambah Transaksi untuk mulai mencatat keuanganmu.",
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
             }
+
+            else -> {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(SiCuanDimens.SpacingSm)
+                ) {
+                    items(
+                        items = transactions,
+                        key = { transaction -> transaction.id }
+                    ) { transaction ->
+                        TransactionItem(
+                            transaction = transaction,
+                            onClick = {
+                                onNavigateToDetailTransaction(transaction.id)
+                            }
+                        )
+                    }
+                }
+            }
         }
     }
+}
+
+@Composable
+private fun TransactionItem(
+    transaction: Transaction,
+    onClick: () -> Unit
+) {
+    val amountColor = if (transaction.type == TransactionType.EXPENSE) {
+        MaterialTheme.colorScheme.error
+    } else {
+        MaterialTheme.colorScheme.primary
+    }
+
+    val typeLabel = if (transaction.type == TransactionType.EXPENSE) {
+        "Pengeluaran"
+    } else {
+        "Pemasukan"
+    }
+
+    val amountPrefix = if (transaction.type == TransactionType.EXPENSE) {
+        "-"
+    } else {
+        "+"
+    }
+
+    SiCuanCard(
+        modifier = Modifier.clickable {
+            onClick()
+        }
+    ) {
+        Text(
+            text = transaction.title,
+            style = MaterialTheme.typography.titleMedium
+        )
+
+        Text(
+            text = "$amountPrefix${formatCurrency(transaction.amount)}",
+            style = MaterialTheme.typography.headlineMedium,
+            color = amountColor
+        )
+
+        Text(
+            text = "$typeLabel • ${transaction.category}",
+            style = MaterialTheme.typography.bodyMedium
+        )
+
+        if (transaction.note.isNotBlank()) {
+            Text(
+                text = transaction.note,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+
+        Text(
+            text = "Klik untuk melihat detail",
+            style = MaterialTheme.typography.labelMedium
+        )
+    }
+}
+
+private fun formatCurrency(amount: Double): String {
+    val formatter = NumberFormat.getCurrencyInstance(Locale("id", "ID"))
+    return formatter.format(amount).replace(",00", "")
 }
