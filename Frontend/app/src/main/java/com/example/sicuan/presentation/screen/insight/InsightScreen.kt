@@ -1,0 +1,33 @@
+package com.example.sicuan.presentation.screen.insight
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import com.example.sicuan.presentation.component.SiCuanCard
+import com.example.sicuan.ui.theme.SiCuanDimens
+
+@Composable
+fun InsightScreen() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(SiCuanDimens.SpacingLg),
+        verticalArrangement = Arrangement.spacedBy(SiCuanDimens.SpacingMd)
+    ) {
+        Text(
+            text = "Insight Keuangan",
+            style = MaterialTheme.typography.headlineLarge,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+
+        SiCuanCard {
+            Text(text = "Data API")
+            Text(text = "Screen ini akan digunakan untuk menampilkan data dari API pihak ketiga.")
+        }
+    }
+}
