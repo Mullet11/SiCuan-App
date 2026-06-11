@@ -1,3 +1,52 @@
 <resources>
     <string name="app_name">SiCuan</string>
+
+    <!-- App Identity -->
+    <string name="sicuan_tagline">Catat cuan, atur masa depan.</string>
+    <string name="sicuan_description">Aplikasi manajemen keuangan mahasiswa.</string>
+
+    <!-- Screen Names -->
+    <string name="screen_splash">SiCuan</string>
+    <string name="screen_onboarding">Onboarding</string>
+    <string name="screen_login">Masuk Akun</string>
+    <string name="screen_register">Buat Akun</string>
+    <string name="screen_pin">Atur PIN</string>
+    <string name="screen_dashboard">Dashboard</string>
+    <string name="screen_transaction_list">Daftar Transaksi</string>
+    <string name="screen_add_transaction">Tambah Transaksi</string>
+    <string name="screen_edit_transaction">Edit Transaksi</string>
+    <string name="screen_detail_transaction">Detail Transaksi</string>
+    <string name="screen_budget">Anggaran</string>
+    <string name="screen_target">Target Keuangan</string>
+    <string name="screen_scan_receipt">Scan Struk</string>
+    <string name="screen_insight">Insight Keuangan</string>
+    <string name="screen_education">Edukasi Finansial</string>
+    <string name="screen_ai_assistant">Asisten AI</string>
+    <string name="screen_profile">Profil</string>
+
+    <!-- Common Action -->
+    <string name="action_start">Mulai</string>
+    <string name="action_save">Simpan</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_delete">Hapus</string>
+    <string name="action_cancel">Batal</string>
+    <string name="action_back">Kembali</string>
+    <string name="action_add_transaction">Tambah Transaksi</string>
+    <string name="action_scan_receipt">Scan Struk</string>
+    <string name="action_input_manual">Input Manual</string>
+
+    <!-- Transaction -->
+    <string name="label_income">Pemasukan</string>
+    <string name="label_expense">Pengeluaran</string>
+    <string name="label_balance">Saldo</string>
+    <string name="label_amount">Nominal</string>
+    <string name="label_category">Kategori</string>
+    <string name="label_date">Tanggal</string>
+    <string name="label_merchant">Merchant</string>
+    <string name="label_note">Catatan</string>
+
+    <!-- State -->
+    <string name="state_loading">Memuat data...</string>
+    <string name="state_empty_transaction">Belum ada transaksi.</string>
+    <string name="state_error">Terjadi kesalahan. Coba lagi.</string>
 </resources>

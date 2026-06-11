@@ -1,10 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- SiCuan Primary -->
+    <color name="sicuan_primary_light">#3F6355</color>
+    <color name="sicuan_primary_dark">#2D6A4F</color>
+
+    <!-- Background -->
+    <color name="sicuan_background_light">#E6FFF6</color>
+    <color name="sicuan_background_dark">#081C15</color>
+
+    <!-- Surface / Cards -->
+    <color name="sicuan_surface_light">#D6F0E2</color>
+    <color name="sicuan_surface_dark">#1B4332</color>
+
+    <!-- Surface Container -->
+    <color name="sicuan_surface_container_light">#D0F6EA</color>
+    <color name="sicuan_surface_container_dark">#2D6A4F</color>
+
+    <!-- Text -->
+    <color name="sicuan_text_light">#1A3C34</color>
+    <color name="sicuan_text_dark">#F1FAEE</color>
+
+    <!-- Accent -->
+    <color name="sicuan_accent_light">#3F6355</color>
+    <color name="sicuan_accent_dark">#1D5357</color>
+
+    <!-- Status -->
+    <color name="sicuan_danger">#BA1A1A</color>
+    <color name="sicuan_income_light">#3F6355</color>
+    <color name="sicuan_income_dark">#4ADE80</color>
 </resources>
