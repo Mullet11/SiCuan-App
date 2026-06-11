@@ -62,6 +62,7 @@ fun SiCuanNavGraph() {
                 balance = transactionUiState.balance,
                 totalIncome = transactionUiState.totalIncome,
                 totalExpense = transactionUiState.totalExpense,
+                allTransactions = transactionUiState.transactions,
                 recentTransactions = transactionUiState.transactions.take(3),
                 onNavigateToTransactions = {
                     navController.navigate(Screen.TransactionList.route)

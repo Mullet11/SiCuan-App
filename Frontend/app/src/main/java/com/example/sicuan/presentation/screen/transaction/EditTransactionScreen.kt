@@ -19,11 +19,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import com.example.sicuan.domain.model.Transaction
+import com.example.sicuan.domain.model.TransactionCategory
 import com.example.sicuan.domain.model.TransactionType
 import com.example.sicuan.presentation.component.SiCuanCard
 import com.example.sicuan.presentation.component.SiCuanPrimaryButton
 import com.example.sicuan.presentation.component.SiCuanSecondaryButton
 import com.example.sicuan.presentation.component.SiCuanTextField
+import com.example.sicuan.presentation.component.TransactionCategorySelector
 import com.example.sicuan.ui.theme.SiCuanDimens
 
 @Composable
@@ -189,6 +191,8 @@ fun EditTransactionScreen(
                     selected = type.value == TransactionType.EXPENSE,
                     onClick = {
                         type.value = TransactionType.EXPENSE
+                        category.value =
+                            TransactionCategory.getDefaultCategoryByType(TransactionType.EXPENSE)
                         onClearMessage()
                     },
                     label = {
@@ -200,6 +204,8 @@ fun EditTransactionScreen(
                     selected = type.value == TransactionType.INCOME,
                     onClick = {
                         type.value = TransactionType.INCOME
+                        category.value =
+                            TransactionCategory.getDefaultCategoryByType(TransactionType.INCOME)
                         onClearMessage()
                     },
                     label = {
@@ -208,14 +214,13 @@ fun EditTransactionScreen(
                 )
             }
 
-            SiCuanTextField(
-                value = category.value,
-                onValueChange = {
+            TransactionCategorySelector(
+                type = type.value,
+                selectedCategory = category.value,
+                onCategorySelected = {
                     category.value = it
                     onClearMessage()
-                },
-                label = "Kategori",
-                placeholder = "Contoh: Makan, Transportasi, Tugas"
+                }
             )
 
             SiCuanTextField(

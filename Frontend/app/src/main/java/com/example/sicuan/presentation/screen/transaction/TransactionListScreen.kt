@@ -3,21 +3,34 @@ package com.example.sicuan.presentation.screen.transaction
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import com.example.sicuan.domain.model.Transaction
 import com.example.sicuan.domain.model.TransactionType
 import com.example.sicuan.presentation.component.SiCuanCard
+import com.example.sicuan.presentation.component.SiCuanEmptyState
+import com.example.sicuan.presentation.component.SiCuanErrorState
+import com.example.sicuan.presentation.component.SiCuanLoadingState
 import com.example.sicuan.presentation.component.SiCuanPrimaryButton
+import com.example.sicuan.presentation.component.SiCuanTextField
 import com.example.sicuan.ui.theme.SiCuanDimens
 import java.text.NumberFormat
 import java.util.Locale
+
+private const val FILTER_ALL = "all"
+private const val FILTER_EXPENSE = "expense"
+private const val FILTER_INCOME = "income"
 
 @Composable
 fun TransactionListScreen(
@@ -27,6 +40,28 @@ fun TransactionListScreen(
     onNavigateToAddTransaction: () -> Unit,
     onNavigateToDetailTransaction: (Int) -> Unit
 ) {
+    val selectedFilter = rememberSaveable { mutableStateOf(FILTER_ALL) }
+    val searchQuery = rememberSaveable { mutableStateOf("") }
+
+    val filteredByType = when (selectedFilter.value) {
+        FILTER_EXPENSE -> transactions.filter { it.type == TransactionType.EXPENSE }
+        FILTER_INCOME -> transactions.filter { it.type == TransactionType.INCOME }
+        else -> transactions
+    }
+
+    val filteredTransactions = if (searchQuery.value.isBlank()) {
+        filteredByType
+    } else {
+        val query = searchQuery.value.trim().lowercase()
+
+        filteredByType.filter { transaction ->
+            transaction.title.lowercase().contains(query) ||
+                    transaction.category.lowercase().contains(query) ||
+                    transaction.note.lowercase().contains(query) ||
+                    transaction.merchant.orEmpty().lowercase().contains(query)
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -44,35 +79,63 @@ fun TransactionListScreen(
             onClick = onNavigateToAddTransaction
         )
 
+        SiCuanTextField(
+            value = searchQuery.value,
+            onValueChange = {
+                searchQuery.value = it
+            },
+            label = "Cari Transaksi",
+            placeholder = "Cari nama, kategori, merchant, atau catatan"
+        )
+
+        TransactionFilterChips(
+            selectedFilter = selectedFilter.value,
+            onFilterSelected = {
+                selectedFilter.value = it
+            }
+        )
+
         when {
             isLoading -> {
-                Text(
-                    text = "Memuat transaksi...",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onBackground
+                SiCuanLoadingState(
+                    message = "Memuat transaksi..."
                 )
             }
 
             errorMessage != null -> {
-                Text(
-                    text = errorMessage,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.error
+                SiCuanErrorState(
+                    title = "Gagal Memuat Transaksi",
+                    message = errorMessage
                 )
             }
 
             transactions.isEmpty() -> {
-                SiCuanCard {
-                    Text(
-                        text = "Belum ada transaksi.",
-                        style = MaterialTheme.typography.titleMedium
-                    )
+                SiCuanEmptyState(
+                    title = "Belum ada transaksi",
+                    message = "Tekan tombol Tambah Transaksi untuk mulai mencatat keuanganmu.",
+                    actionText = "Tambah Transaksi",
+                    onActionClick = onNavigateToAddTransaction
+                )
+            }
 
-                    Text(
-                        text = "Tekan tombol Tambah Transaksi untuk mulai mencatat keuanganmu.",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+            filteredByType.isEmpty() -> {
+                val filterLabel = when (selectedFilter.value) {
+                    FILTER_EXPENSE -> "pengeluaran"
+                    FILTER_INCOME -> "pemasukan"
+                    else -> "transaksi"
                 }
+
+                SiCuanEmptyState(
+                    title = "Tidak ada $filterLabel",
+                    message = "Belum ada data $filterLabel yang tersimpan di database lokal."
+                )
+            }
+
+            filteredTransactions.isEmpty() -> {
+                SiCuanEmptyState(
+                    title = "Transaksi tidak ditemukan",
+                    message = "Tidak ada transaksi yang cocok dengan kata kunci \"${searchQuery.value}\"."
+                )
             }
 
             else -> {
@@ -80,7 +143,7 @@ fun TransactionListScreen(
                     verticalArrangement = Arrangement.spacedBy(SiCuanDimens.SpacingSm)
                 ) {
                     items(
-                        items = transactions,
+                        items = filteredTransactions,
                         key = { transaction -> transaction.id }
                     ) { transaction ->
                         TransactionItem(
@@ -92,6 +155,57 @@ fun TransactionListScreen(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun TransactionFilterChips(
+    selectedFilter: String,
+    onFilterSelected: (String) -> Unit
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(SiCuanDimens.SpacingSm)
+    ) {
+        Text(
+            text = "Filter Transaksi",
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(SiCuanDimens.SpacingSm)
+        ) {
+            FilterChip(
+                selected = selectedFilter == FILTER_ALL,
+                onClick = {
+                    onFilterSelected(FILTER_ALL)
+                },
+                label = {
+                    Text(text = "Semua")
+                }
+            )
+
+            FilterChip(
+                selected = selectedFilter == FILTER_EXPENSE,
+                onClick = {
+                    onFilterSelected(FILTER_EXPENSE)
+                },
+                label = {
+                    Text(text = "Pengeluaran")
+                }
+            )
+
+            FilterChip(
+                selected = selectedFilter == FILTER_INCOME,
+                onClick = {
+                    onFilterSelected(FILTER_INCOME)
+                },
+                label = {
+                    Text(text = "Pemasukan")
+                }
+            )
         }
     }
 }
@@ -139,6 +253,13 @@ private fun TransactionItem(
             text = "$typeLabel • ${transaction.category}",
             style = MaterialTheme.typography.bodyMedium
         )
+
+        if (!transaction.merchant.isNullOrBlank()) {
+            Text(
+                text = "Merchant: ${transaction.merchant}",
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
 
         if (transaction.note.isNotBlank()) {
             Text(
