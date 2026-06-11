@@ -26,6 +26,8 @@ import com.example.sicuan.presentation.viewmodel.TransactionViewModel
 import com.example.sicuan.presentation.viewmodel.TransactionViewModelFactory
 import com.example.sicuan.presentation.viewmodel.BudgetViewModel
 import com.example.sicuan.presentation.viewmodel.BudgetViewModelFactory
+import com.example.sicuan.presentation.viewmodel.CurrencyViewModel
+import com.example.sicuan.presentation.viewmodel.CurrencyViewModelFactory
 
 @Composable
 fun SiCuanNavGraph() {
@@ -52,6 +54,16 @@ fun SiCuanNavGraph() {
     )
 
     val budgetUiState by budgetViewModel.uiState.collectAsState()
+
+    val currencyUseCases = remember {
+        AppModule.provideCurrencyUseCases()
+    }
+
+    val currencyViewModel: CurrencyViewModel = viewModel(
+        factory = CurrencyViewModelFactory(currencyUseCases)
+    )
+
+    val currencyUiState by currencyViewModel.uiState.collectAsState()
 
     NavHost(
         navController = navController,
@@ -251,7 +263,17 @@ fun SiCuanNavGraph() {
         }
 
         composable(Screen.Insight.route) {
-            InsightScreen()
+            InsightScreen(
+                currencyRates = currencyUiState.rates,
+                isLoading = currencyUiState.isLoading,
+                errorMessage = currencyUiState.errorMessage,
+                onRefresh = {
+                    currencyViewModel.fetchLatestRates()
+                },
+                onBack = {
+                    navController.popBackStack()
+                }
+            )
         }
 
         composable(Screen.Profile.route) {

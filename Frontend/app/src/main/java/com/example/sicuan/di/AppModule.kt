@@ -20,6 +20,12 @@ import com.example.sicuan.domain.usecase.budget.DeleteBudgetUseCase
 import com.example.sicuan.domain.usecase.budget.GetAllBudgetsUseCase
 import com.example.sicuan.domain.usecase.budget.GetBudgetByIdUseCase
 import com.example.sicuan.domain.usecase.budget.UpdateBudgetUseCase
+import com.example.sicuan.data.remote.api.CurrencyApiService
+import com.example.sicuan.data.remote.api.RetrofitClient
+import com.example.sicuan.data.repository.CurrencyRepositoryImpl
+import com.example.sicuan.domain.repository.CurrencyRepository
+import com.example.sicuan.domain.usecase.currency.CurrencyUseCases
+import com.example.sicuan.domain.usecase.currency.GetLatestCurrencyRatesUseCase
 
 object AppModule {
 
@@ -66,6 +72,24 @@ object AppModule {
             addBudget = AddBudgetUseCase(repository),
             updateBudget = UpdateBudgetUseCase(repository),
             deleteBudget = DeleteBudgetUseCase(repository)
+        )
+    }
+
+    fun provideCurrencyApiService(): CurrencyApiService {
+        return RetrofitClient.currencyApiService
+    }
+
+    fun provideCurrencyRepository(): CurrencyRepository {
+        return CurrencyRepositoryImpl(
+            currencyApiService = provideCurrencyApiService()
+        )
+    }
+
+    fun provideCurrencyUseCases(): CurrencyUseCases {
+        val repository = provideCurrencyRepository()
+
+        return CurrencyUseCases(
+            getLatestCurrencyRates = GetLatestCurrencyRatesUseCase(repository)
         )
     }
 }
