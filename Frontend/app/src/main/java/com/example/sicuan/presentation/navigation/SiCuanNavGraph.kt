@@ -28,11 +28,23 @@ import com.example.sicuan.presentation.viewmodel.BudgetViewModel
 import com.example.sicuan.presentation.viewmodel.BudgetViewModelFactory
 import com.example.sicuan.presentation.viewmodel.CurrencyViewModel
 import com.example.sicuan.presentation.viewmodel.CurrencyViewModelFactory
+import com.example.sicuan.presentation.viewmodel.FirebaseAuthViewModel
+import com.example.sicuan.presentation.viewmodel.FirebaseAuthViewModelFactory
 
 @Composable
 fun SiCuanNavGraph() {
     val navController = rememberNavController()
     val context = LocalContext.current
+
+    val firebaseAuthUseCases = remember {
+        AppModule.provideFirebaseAuthUseCases()
+    }
+
+    val firebaseAuthViewModel: FirebaseAuthViewModel = viewModel(
+        factory = FirebaseAuthViewModelFactory(firebaseAuthUseCases)
+    )
+
+    val firebaseAuthUiState by firebaseAuthViewModel.uiState.collectAsState()
 
     val transactionUseCases = remember {
         AppModule.provideTransactionUseCases(context)
@@ -277,7 +289,15 @@ fun SiCuanNavGraph() {
         }
 
         composable(Screen.Profile.route) {
-            ProfileScreen()
+            ProfileScreen(
+                firebaseAuthUiState = firebaseAuthUiState,
+                onRetrySignIn = {
+                    firebaseAuthViewModel.signInAnonymouslyIfNeeded()
+                },
+                onBack = {
+                    navController.popBackStack()
+                }
+            )
         }
     }
 }

@@ -26,6 +26,14 @@ import com.example.sicuan.data.repository.CurrencyRepositoryImpl
 import com.example.sicuan.domain.repository.CurrencyRepository
 import com.example.sicuan.domain.usecase.currency.CurrencyUseCases
 import com.example.sicuan.domain.usecase.currency.GetLatestCurrencyRatesUseCase
+import com.example.sicuan.data.repository.FirebaseAuthRepositoryImpl
+import com.example.sicuan.domain.repository.FirebaseAuthRepository
+import com.example.sicuan.domain.usecase.auth.FirebaseAuthUseCases
+import com.example.sicuan.domain.usecase.auth.GetCurrentFirebaseUserUseCase
+import com.example.sicuan.domain.usecase.auth.SignInAnonymouslyUseCase
+import com.google.firebase.auth.FirebaseAuth
+import com.example.sicuan.data.remote.firebase.FirestoreTransactionRemoteDataSource
+import com.google.firebase.firestore.FirebaseFirestore
 
 object AppModule {
 
@@ -37,7 +45,8 @@ object AppModule {
         val database = provideDatabase(context)
 
         return TransactionRepositoryImpl(
-            transactionDao = database.transactionDao()
+            transactionDao = database.transactionDao(),
+            firestoreTransactionRemoteDataSource = provideFirestoreTransactionRemoteDataSource()
         )
     }
 
@@ -90,6 +99,36 @@ object AppModule {
 
         return CurrencyUseCases(
             getLatestCurrencyRates = GetLatestCurrencyRatesUseCase(repository)
+        )
+    }
+
+    fun provideFirebaseAuth(): FirebaseAuth {
+        return FirebaseAuth.getInstance()
+    }
+
+    fun provideFirebaseAuthRepository(): FirebaseAuthRepository {
+        return FirebaseAuthRepositoryImpl(
+            firebaseAuth = provideFirebaseAuth()
+        )
+    }
+
+    fun provideFirebaseAuthUseCases(): FirebaseAuthUseCases {
+        val repository = provideFirebaseAuthRepository()
+
+        return FirebaseAuthUseCases(
+            signInAnonymously = SignInAnonymouslyUseCase(repository),
+            getCurrentFirebaseUser = GetCurrentFirebaseUserUseCase(repository)
+        )
+    }
+
+    fun provideFirebaseFirestore(): FirebaseFirestore {
+        return FirebaseFirestore.getInstance()
+    }
+
+    fun provideFirestoreTransactionRemoteDataSource(): FirestoreTransactionRemoteDataSource {
+        return FirestoreTransactionRemoteDataSource(
+            firestore = provideFirebaseFirestore(),
+            firebaseAuth = provideFirebaseAuth()
         )
     }
 }

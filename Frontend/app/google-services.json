@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "790188577240",
+    "project_id": "sicuan-1140",
+    "storage_bucket": "sicuan-1140.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:790188577240:android:5f449b426fb8986a3562ad",
+        "android_client_info": {
+          "package_name": "com.example.sicuan"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDS0xx58xA7IUX9TlXd8gGQmKqTdAHnsoU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
