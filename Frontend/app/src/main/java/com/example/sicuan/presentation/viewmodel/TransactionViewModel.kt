@@ -81,6 +81,7 @@ class TransactionViewModel(
         category: String = "Umum",
         note: String = "",
         merchant: String? = null,
+        dateMillis: Long = System.currentTimeMillis(),
         onSuccess: () -> Unit = {}
     ) {
         val amount = amountText.toDoubleOrNull()
@@ -106,7 +107,7 @@ class TransactionViewModel(
                     amount = amount,
                     type = type,
                     category = category.ifBlank { "Umum" },
-                    date = System.currentTimeMillis(),
+                    date = dateMillis,
                     note = note.trim(),
                     merchant = merchant
                 )

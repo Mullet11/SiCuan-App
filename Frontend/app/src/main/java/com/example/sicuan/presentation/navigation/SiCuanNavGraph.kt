@@ -30,6 +30,7 @@ import com.example.sicuan.presentation.viewmodel.CurrencyViewModel
 import com.example.sicuan.presentation.viewmodel.CurrencyViewModelFactory
 import com.example.sicuan.presentation.viewmodel.FirebaseAuthViewModel
 import com.example.sicuan.presentation.viewmodel.FirebaseAuthViewModelFactory
+import com.example.sicuan.presentation.screen.ocr.ScanReceiptScreen
 
 @Composable
 fun SiCuanNavGraph() {
@@ -116,7 +117,12 @@ fun SiCuanNavGraph() {
                 },
                 onNavigateToProfile = {
                     navController.navigate(Screen.Profile.route)
-                }
+                },
+
+                onScanReceiptClick = {
+                    navController.navigate(Screen.ScanReceipt.route)
+                },
+
             )
         }
 
@@ -158,6 +164,32 @@ fun SiCuanNavGraph() {
                             navController.popBackStack()
                         }
                     )
+                }
+            )
+        }
+
+        composable(Screen.ScanReceipt.route) {
+            ScanReceiptScreen(
+                transactionErrorMessage = transactionUiState.errorMessage,
+                onClearMessage = {
+                    transactionViewModel.clearMessage()
+                },
+                onSaveTransaction = { title, amount, type, category, note, merchant, dateMillis ->
+                    transactionViewModel.addTransaction(
+                        title = title,
+                        amountText = amount,
+                        type = type,
+                        category = category,
+                        note = note,
+                        merchant = merchant,
+                        dateMillis = dateMillis,
+                        onSuccess = {
+                            navController.popBackStack()
+                        }
+                    )
+                },
+                onBack = {
+                    navController.popBackStack()
                 }
             )
         }

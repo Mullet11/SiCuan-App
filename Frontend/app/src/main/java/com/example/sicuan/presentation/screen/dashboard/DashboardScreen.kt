@@ -31,6 +31,7 @@ fun DashboardScreen(
     allTransactions: List<Transaction>,
     recentTransactions: List<Transaction>,
     onNavigateToTransactions: () -> Unit,
+    onScanReceiptClick: () -> Unit,
     onNavigateToTransactionDetail: (Int) -> Unit,
     onNavigateToBudget: () -> Unit,
     onNavigateToInsight: () -> Unit,
@@ -169,6 +170,11 @@ fun DashboardScreen(
         SiCuanPrimaryButton(
             text = "Lihat Semua Transaksi",
             onClick = onNavigateToTransactions
+        )
+
+        SiCuanSecondaryButton(
+            text = "Scan Struk OCR",
+            onClick = onScanReceiptClick
         )
 
         SiCuanSecondaryButton(
