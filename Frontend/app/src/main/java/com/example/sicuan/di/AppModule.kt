@@ -34,6 +34,7 @@ import com.example.sicuan.domain.usecase.auth.SignInAnonymouslyUseCase
 import com.google.firebase.auth.FirebaseAuth
 import com.example.sicuan.data.remote.firebase.FirestoreTransactionRemoteDataSource
 import com.google.firebase.firestore.FirebaseFirestore
+import com.example.sicuan.data.remote.firebase.FirestoreBudgetRemoteDataSource
 
 object AppModule {
 
@@ -68,7 +69,8 @@ object AppModule {
         val database = provideDatabase(context)
 
         return BudgetRepositoryImpl(
-            budgetDao = database.budgetDao()
+            budgetDao = database.budgetDao(),
+            firestoreBudgetRemoteDataSource = provideFirestoreBudgetRemoteDataSource()
         )
     }
 
@@ -127,6 +129,13 @@ object AppModule {
 
     fun provideFirestoreTransactionRemoteDataSource(): FirestoreTransactionRemoteDataSource {
         return FirestoreTransactionRemoteDataSource(
+            firestore = provideFirebaseFirestore(),
+            firebaseAuth = provideFirebaseAuth()
+        )
+    }
+
+    fun provideFirestoreBudgetRemoteDataSource(): FirestoreBudgetRemoteDataSource {
+        return FirestoreBudgetRemoteDataSource(
             firestore = provideFirebaseFirestore(),
             firebaseAuth = provideFirebaseAuth()
         )
