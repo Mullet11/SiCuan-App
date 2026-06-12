@@ -1,0 +1,73 @@
+{
+  "users": {
+    "sampleUid": {
+      "transactions": {
+        "1": {
+          "id": 1,
+          "title": "Makan Siang",
+          "amount": 15000,
+          "type": "expense",
+          "category": "Makan",
+          "date": 1718000000000,
+          "note": "Contoh transaksi pengeluaran",
+          "merchant": "Warung Bu Ani",
+          "createdAt": 1718000000000,
+          "updatedAt": 1718000000000
+        },
+        "2": {
+          "id": 2,
+          "title": "Uang Saku Bulanan",
+          "amount": 1000000,
+          "type": "income",
+          "category": "Uang Saku",
+          "date": 1718000000000,
+          "note": "Contoh transaksi pemasukan",
+          "merchant": null,
+          "createdAt": 1718000000000,
+          "updatedAt": 1718000000000
+        }
+      },
+      "budgets": {
+        "1": {
+          "id": 1,
+          "category": "Makan",
+          "limitAmount": 500000,
+          "createdAt": 1718000000000,
+          "updatedAt": 1718000000000
+        },
+        "2": {
+          "id": 2,
+          "category": "Transportasi",
+          "limitAmount": 200000,
+          "createdAt": 1718000000000,
+          "updatedAt": 1718000000000
+        }
+      },
+      "targets": {
+        "1": {
+          "id": 1,
+          "name": "Dana Laptop",
+          "targetAmount": 3000000,
+          "currentAmount": 500000,
+          "deadline": 1728000000000,
+          "createdAt": 1718000000000,
+          "updatedAt": 1718000000000
+        }
+      },
+      "literacy": {
+        "quizResult": {
+          "score": 80,
+          "level": "Menengah",
+          "recommendation": "Pelajari materi budgeting dan dana darurat."
+        }
+      },
+      "aiLogs": {
+        "1": {
+          "question": "Bagaimana cara menghemat pengeluaran makan?",
+          "answer": "Kurangi pembelian impulsif dan buat batas budget makan mingguan.",
+          "createdAt": 1718000000000
+        }
+      }
+    }
+  }
+}
