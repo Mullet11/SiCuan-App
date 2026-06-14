@@ -23,11 +23,11 @@ import androidx.compose.ui.unit.sp
 fun EducationScreen(
     onBack: () -> Unit
 ) {
-    val darkBackground = Color(0xFF0B1914)
-    val cardBackground = Color(0xFF1E3A2F)
-    val primaryText = Color.White
-    val secondaryText = Color(0xFFA0A0A0)
-    val progressColor = Color(0xFF4CAF50)
+    val darkBackground = MaterialTheme.colorScheme.background
+    val cardBackground = MaterialTheme.colorScheme.surfaceVariant
+    val primaryText = MaterialTheme.colorScheme.onBackground
+    val secondaryText = MaterialTheme.colorScheme.onSurfaceVariant
+    val progressColor = MaterialTheme.colorScheme.primary
 
     val uriHandler = LocalUriHandler.current
 

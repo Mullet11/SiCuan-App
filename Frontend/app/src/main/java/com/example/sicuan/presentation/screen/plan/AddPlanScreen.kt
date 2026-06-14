@@ -56,12 +56,12 @@ fun AddPlanScreen(
     )
 
     // Colors to match dark mode screenshot
-    val darkBackground = Color(0xFF0B1914)
-    val cardBackground = Color(0xFF1E3A2F)
-    val inputBackground = Color(0xFF0F1E18)
-    val primaryText = Color.White
-    val secondaryText = Color(0xFFA0A0A0)
-    val buttonColor = Color(0xFF3B7A57)
+    val darkBackground = MaterialTheme.colorScheme.background
+    val cardBackground = MaterialTheme.colorScheme.surfaceVariant
+    val inputBackground = MaterialTheme.colorScheme.surface
+    val primaryText = MaterialTheme.colorScheme.onBackground
+    val secondaryText = MaterialTheme.colorScheme.onSurfaceVariant
+    val buttonColor = MaterialTheme.colorScheme.primary
 
     LaunchedEffect(errorMessage) {
         if (errorMessage != null) {

@@ -103,14 +103,32 @@ fun ProfileScreen(
 
             // Profile Picture & Name
             Box(contentAlignment = Alignment.BottomEnd) {
-                AsyncImage(
-                    model = firebaseAuthUiState.photoUrl ?: R.drawable.ic_launcher_background,
-                    contentDescription = "Profile Picture",
-                    modifier = Modifier
-                        .size(100.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop
-                )
+                if (firebaseAuthUiState.photoUrl != null) {
+                    AsyncImage(
+                        model = firebaseAuthUiState.photoUrl,
+                        contentDescription = "Profile Picture",
+                        modifier = Modifier
+                            .size(100.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.surfaceVariant),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .size(100.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.surfaceVariant),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            Icons.Default.Person,
+                            contentDescription = "Profile Picture",
+                            modifier = Modifier.size(64.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
                 Box(
                     modifier = Modifier
                         .size(32.dp)

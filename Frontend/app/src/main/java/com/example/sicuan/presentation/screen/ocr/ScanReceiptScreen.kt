@@ -191,19 +191,19 @@ fun ScanReceiptScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Tambah Transaksi", fontWeight = FontWeight.Bold, color = Color.White) },
+                title = { Text("Tambah Transaksi", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = MaterialTheme.colorScheme.onBackground)
                     }
                 },
                 actions = {
                     IconButton(onClick = { /* TODO: Help Info */ }) {
-                        Icon(Icons.Default.HelpOutline, contentDescription = "Bantuan", tint = Color.White)
+                        Icon(Icons.Default.HelpOutline, contentDescription = "Bantuan", tint = MaterialTheme.colorScheme.onBackground)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF1E3A2F)
+                    containerColor = MaterialTheme.colorScheme.background
                 )
             )
         }
@@ -211,7 +211,7 @@ fun ScanReceiptScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFF1E3A2F))
+                .background(MaterialTheme.colorScheme.background)
                 .padding(paddingValues)
         ) {
             if (hasCameraPermission) {
