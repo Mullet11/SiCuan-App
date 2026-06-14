@@ -65,7 +65,6 @@ fun InsightScreen(
     val progressColor = MaterialTheme.colorScheme.primary
     val trackColor = MaterialTheme.colorScheme.primaryContainer
 
-    // Calculate Score — konsisten dengan Dashboard
     val totalIncome = transactions.filter { it.type == TransactionType.INCOME }.sumOf { it.amount }
     val totalExpense = transactions.filter { it.type == TransactionType.EXPENSE }.sumOf { it.amount }
     val expenseRatio = if (totalIncome > 0) (totalExpense / totalIncome) else 0.0
@@ -82,7 +81,7 @@ fun InsightScreen(
         expenseRatio <= 1.0 -> "Perlu Perhatian"
         else -> "Buruk"
     }
-    
+
     val scoreDesc = when {
         totalIncome == 0.0 && totalExpense == 0.0 -> "Belum ada data transaksi. Mulai catat pemasukan dan pengeluaranmu!"
         expenseRatio <= 0.4 -> "Luar biasa! Pengeluaranmu sangat terkendali. Kamu menabung lebih dari 60% penghasilan!"
@@ -167,7 +166,6 @@ fun InsightScreen(
         ) {
             item {
                 Spacer(modifier = Modifier.height(8.dp))
-                // Financial Score Card
                 Card(
                     shape = RoundedCornerShape(24.dp),
                     colors = CardDefaults.cardColors(containerColor = cardBackground),
@@ -383,7 +381,6 @@ fun InsightScreen(
                             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                             Spacer(modifier = Modifier.height(8.dp))
 
-                            // Financial summary mini row
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween
@@ -397,12 +394,10 @@ fun InsightScreen(
                             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                             Spacer(modifier = Modifier.height(4.dp))
 
-                            // Action Buttons
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceEvenly
                             ) {
-                                // Share
                                 IconButton(onClick = {
                                     val shareText = buildString {
                                         appendLine("\uD83D\uDCCA *${report.title}*")
@@ -422,13 +417,11 @@ fun InsightScreen(
                                 }) {
                                     Icon(Icons.Outlined.Share, contentDescription = "Bagikan", tint = MaterialTheme.colorScheme.secondary)
                                 }
-                                // Download
                                 IconButton(onClick = {
                                     PdfExportHelper.generateReportPdf(context, report)
                                 }) {
                                     Icon(Icons.Outlined.Download, contentDescription = "Download", tint = MaterialTheme.colorScheme.primary)
                                 }
-                                // Delete
                                 IconButton(onClick = {
                                     onDeleteReport(report.id)
                                 }) {
@@ -441,7 +434,7 @@ fun InsightScreen(
             }
 
             item {
-                Spacer(modifier = Modifier.height(80.dp)) // Nav bar space
+                Spacer(modifier = Modifier.height(80.dp))
             }
         }
     }

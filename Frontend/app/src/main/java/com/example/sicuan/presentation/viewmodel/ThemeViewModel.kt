@@ -10,8 +10,7 @@ import kotlinx.coroutines.flow.update
 
 class ThemeViewModel(application: Application) : AndroidViewModel(application) {
     private val prefs = application.getSharedPreferences("sicuan_theme_prefs", Context.MODE_PRIVATE)
-    
-    // Load saved theme, default to true (Dark Mode)
+
     private val _isDarkMode = MutableStateFlow(prefs.getBoolean("is_dark_mode", true))
     val isDarkMode: StateFlow<Boolean> = _isDarkMode.asStateFlow()
 

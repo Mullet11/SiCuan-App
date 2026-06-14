@@ -27,17 +27,15 @@ class AiAssistantViewModel : ViewModel() {
     private var generativeModel: GenerativeModel? = null
 
     init {
-        // Initialize Gemini model if API key is provided
         val apiKey = BuildConfig.GEMINI_API_KEY
         if (apiKey.isNotEmpty()) {
             generativeModel = GenerativeModel(
                 modelName = "gemini-flash-latest",
                 apiKey = apiKey,
-                systemInstruction = content { 
+                systemInstruction = content {
                     text("Anda adalah SiCuan AI, asisten keuangan pribadi cerdas berbahasa Indonesia. Anda ahli dalam memberikan saran manajemen keuangan mahasiswa secara ringkas, ramah, dan solutif. Jangan memberikan jawaban yang terlalu panjang, dan gunakan emoji sesekali.")
                 }
             )
-            // Add initial welcome message
             _chatHistory.value = listOf(
                 ChatMessage(
                     text = "Halo! Saya SiCuan AI. Ada yang bisa saya bantu terkait pengelolaan keuangan Anda hari ini?",
@@ -57,12 +55,10 @@ class AiAssistantViewModel : ViewModel() {
     fun sendMessage(userMessage: String, financialContext: String = "") {
         if (userMessage.isBlank()) return
 
-        // Add user message to UI
         val currentHistory = _chatHistory.value.toMutableList()
         currentHistory.add(ChatMessage(text = userMessage, isFromUser = true))
         _chatHistory.value = currentHistory
 
-        // Check if model is initialized
         if (generativeModel == null) {
             currentHistory.add(ChatMessage(text = "Sistem AI tidak dapat merespons karena API Key belum dikonfigurasi.", isFromUser = false))
             _chatHistory.value = currentHistory
@@ -73,7 +69,6 @@ class AiAssistantViewModel : ViewModel() {
 
         viewModelScope.launch {
             try {
-                // Prepend context if needed, but only send it to the model secretly
                 val prompt = if (financialContext.isNotBlank()) {
                     "Konteks keuangan pengguna saat ini: $financialContext\n\nPertanyaan pengguna: $userMessage"
                 } else {
@@ -81,9 +76,9 @@ class AiAssistantViewModel : ViewModel() {
                 }
 
                 val response = generativeModel?.generateContent(prompt)
-                
+
                 val responseText = response?.text ?: "Maaf, saya tidak mengerti. Bisa ulangi?"
-                
+
                 val newHistory = _chatHistory.value.toMutableList()
                 newHistory.add(ChatMessage(text = responseText, isFromUser = false))
                 _chatHistory.value = newHistory

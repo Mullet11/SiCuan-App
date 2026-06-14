@@ -40,7 +40,7 @@ fun AuthScreen(
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var name by remember { mutableStateOf("") } // Used only for register
+    var name by remember { mutableStateOf("") }
     var showPassword by remember { mutableStateOf(false) }
 
     LaunchedEffect(uiState.isSignedIn) {
@@ -55,7 +55,6 @@ fun AuthScreen(
             .background(MaterialTheme.colorScheme.primary),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Top section
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -69,10 +68,8 @@ fun AuthScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Dummy back button area
                 Box(modifier = Modifier.size(24.dp))
-                
-                // Toggle Login / Register
+
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.clickable {
@@ -107,7 +104,6 @@ fun AuthScreen(
             Spacer(modifier = Modifier.weight(1f))
         }
 
-        // Bottom Card Section
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -133,7 +129,7 @@ fun AuthScreen(
                         style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
                         color = MaterialTheme.colorScheme.onSurface
                     )
-                    
+
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
@@ -144,7 +140,6 @@ fun AuthScreen(
 
                     Spacer(modifier = Modifier.height(32.dp))
 
-                    // Error Message
                     if (uiState.errorMessage != null) {
                         Text(
                             text = uiState.errorMessage!!,

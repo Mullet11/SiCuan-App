@@ -22,20 +22,17 @@ object PdfExportHelper {
 
     fun generateReportPdf(context: Context, report: ReportData) {
         val pdfDocument = PdfDocument()
-        val pageInfo = PdfDocument.PageInfo.Builder(595, 842, 1).create() // A4 size
+        val pageInfo = PdfDocument.PageInfo.Builder(595, 842, 1).create()
         val page = pdfDocument.startPage(pageInfo)
 
         val canvas: Canvas = page.canvas
         val paint = Paint()
 
-        // Formatting
         val formatter = NumberFormat.getCurrencyInstance(Locale("id", "ID"))
-        
-        // Background
+
         paint.color = Color.WHITE
         canvas.drawRect(0f, 0f, 595f, 842f, paint)
 
-        // Header
         paint.color = Color.parseColor("#1B5E20")
         canvas.drawRect(0f, 0f, 595f, 100f, paint)
 
@@ -48,7 +45,6 @@ object PdfExportHelper {
         paint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
         canvas.drawText(report.subtitle, 40f, 75f, paint)
 
-        // Financial Summary Section
         var startY = 150f
         paint.color = Color.BLACK
         paint.textSize = 18f
@@ -59,36 +55,31 @@ object PdfExportHelper {
         paint.textSize = 14f
         paint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
 
-        // Pemasukan
         paint.color = Color.DKGRAY
         canvas.drawText("Total Pemasukan:", 40f, startY, paint)
-        paint.color = Color.parseColor("#4CAF50") // Green
+        paint.color = Color.parseColor("#4CAF50")
         canvas.drawText(formatter.format(report.totalIncome), 250f, startY, paint)
 
-        // Pengeluaran
         startY += 30f
         paint.color = Color.DKGRAY
         canvas.drawText("Total Pengeluaran:", 40f, startY, paint)
-        paint.color = Color.parseColor("#EF5350") // Red
+        paint.color = Color.parseColor("#EF5350")
         canvas.drawText(formatter.format(report.totalExpense), 250f, startY, paint)
 
-        // Saldo
         startY += 30f
         paint.color = Color.DKGRAY
         canvas.drawText("Saldo Akhir:", 40f, startY, paint)
-        paint.color = Color.parseColor("#42A5F5") // Blue
+        paint.color = Color.parseColor("#42A5F5")
         paint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
         canvas.drawText(formatter.format(report.balance), 250f, startY, paint)
         paint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
 
-        // Transaction Count
         startY += 30f
         paint.color = Color.DKGRAY
         canvas.drawText("Jumlah Transaksi:", 40f, startY, paint)
         paint.color = Color.BLACK
         canvas.drawText("${report.transactionCount}", 250f, startY, paint)
 
-        // Top Categories Section
         if (report.topCategories.isNotEmpty()) {
             startY += 60f
             paint.color = Color.BLACK
@@ -104,16 +95,15 @@ object PdfExportHelper {
                 startY += 30f
                 paint.color = Color.DKGRAY
                 canvas.drawText(category.name, 40f, startY, paint)
-                
+
                 paint.color = Color.parseColor("#EF5350")
                 canvas.drawText(formatter.format(category.amount), 250f, startY, paint)
-                
+
                 paint.color = Color.BLACK
                 canvas.drawText("${String.format("%.1f", category.percentage)}%", 450f, startY, paint)
             }
         }
 
-        // Footer
         paint.color = Color.GRAY
         paint.textSize = 10f
         paint.textAlign = Paint.Align.CENTER

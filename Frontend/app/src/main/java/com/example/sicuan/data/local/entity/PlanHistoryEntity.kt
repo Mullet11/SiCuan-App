@@ -22,6 +22,6 @@ data class PlanHistoryEntity(
     val id: Int = 0,
     val planId: Int,
     val amount: Double,
-    val type: String, // "TOP_UP" or "WITHDRAW"
+    val type: String,
     val dateMillis: Long
 )

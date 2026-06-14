@@ -59,10 +59,9 @@ fun PlanDetailScreen(
     var showTopUpSheet by remember { mutableStateOf(false) }
     var showWithdrawSheet by remember { mutableStateOf(false) }
     var recommendedTopUp by remember { mutableStateOf(0.0) }
-    
-    // Nudge Calculation
+
     var monthsRemaining by remember { mutableStateOf(1) }
-    
+
     LaunchedEffect(plan) {
         if (plan != null) {
             val now = System.currentTimeMillis()
@@ -79,7 +78,6 @@ fun PlanDetailScreen(
 
     LaunchedEffect(successMessage, errorMessage) {
         if (successMessage != null || errorMessage != null) {
-            // handle snackbar if needed
         }
     }
 
@@ -158,7 +156,6 @@ fun PlanDetailScreen(
         ) {
             item {
                 Spacer(modifier = Modifier.height(16.dp))
-                // Circular Progress
                 Box(
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.Center
@@ -207,7 +204,6 @@ fun PlanDetailScreen(
             }
 
             item {
-                // Smart Nudge Card
                 if (!isTargetReached && recommendedTopUp > 0) {
                     Card(
                         shape = RoundedCornerShape(16.dp),
@@ -283,7 +279,7 @@ fun PlanDetailScreen(
             }
 
             item {
-                Spacer(modifier = Modifier.height(80.dp)) // Extra space for Bottom Bar
+                Spacer(modifier = Modifier.height(80.dp))
             }
         }
     }
@@ -317,7 +313,7 @@ fun HistoryItem(history: PlanHistory) {
     val amountPrefix = if (isTopUp) "+" else "-"
     val amountColor = if (isTopUp) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
     val icon = if (isTopUp) Icons.Default.Add else Icons.Default.Remove
-    
+
     val dateFormat = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale("id", "ID"))
     val dateString = dateFormat.format(Date(history.dateMillis))
 
@@ -393,7 +389,7 @@ fun TopUpBottomSheet(
                 fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.height(24.dp))
-            
+
             OutlinedTextField(
                 value = amountText,
                 onValueChange = { newValue ->
@@ -430,11 +426,11 @@ fun TopUpBottomSheet(
                     horizontalArrangement = Arrangement.Start
                 ) {
                     AssistChip(
-                        onClick = { 
+                        onClick = {
                             val localeID = Locale("in", "ID")
                             val formatRupiah = NumberFormat.getCurrencyInstance(localeID)
                             formatRupiah.maximumFractionDigits = 0
-                            amountText = formatRupiah.format(recommendedAmount).replace("Rp", "").trim() 
+                            amountText = formatRupiah.format(recommendedAmount).replace("Rp", "").trim()
                         },
                         label = { Text("Isi Sesuai Saran", color = primaryText) },
                         colors = AssistChipDefaults.assistChipColors(containerColor = darkBackground)
@@ -499,7 +495,7 @@ fun WithdrawBottomSheet(
                 fontSize = 14.sp
             )
             Spacer(modifier = Modifier.height(24.dp))
-            
+
             OutlinedTextField(
                 value = amountText,
                 onValueChange = { newValue ->

@@ -29,24 +29,23 @@ fun SiCuanBottomNavBar(
             selected = currentRoute == "dashboard",
             onClick = { onNavigate("dashboard") }
         )
-        
+
         BottomNavigationItem(
             icon = { Icon(Icons.Outlined.PieChart, contentDescription = "Analisis", tint = if (currentRoute == "insight") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant) },
             label = { Text("Analisis", style = MaterialTheme.typography.labelSmall, color = if (currentRoute == "insight") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant) },
             selected = currentRoute == "insight",
             onClick = { onNavigate("insight") }
         )
-        
-        // Tengah Kosong untuk FAB Cutout
+
         Spacer(Modifier.weight(1f))
-        
+
         BottomNavigationItem(
             icon = { Icon(Icons.Outlined.Event, contentDescription = "Rencana", tint = if (currentRoute == "plan") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant) },
             label = { Text("Rencana", style = MaterialTheme.typography.labelSmall, color = if (currentRoute == "plan") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant) },
             selected = currentRoute == "plan",
             onClick = { onNavigate("plan") }
         )
-        
+
         BottomNavigationItem(
             icon = { Icon(Icons.Default.Person, contentDescription = "Profil", tint = if (currentRoute == "profile") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant) },
             label = { Text("Profil", style = MaterialTheme.typography.labelSmall, color = if (currentRoute == "profile") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant) },

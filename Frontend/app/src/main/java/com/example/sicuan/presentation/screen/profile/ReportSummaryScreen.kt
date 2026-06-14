@@ -106,7 +106,6 @@ fun ReportSummaryScreen(
         ) {
             Spacer(modifier = Modifier.height(4.dp))
 
-            // Balance Card
             Card(
                 shape = RoundedCornerShape(20.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.Transparent),
@@ -155,12 +154,10 @@ fun ReportSummaryScreen(
                 }
             }
 
-            // Income & Expense Row
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Income Card
                 Card(
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(containerColor = cardBackground),
@@ -202,7 +199,6 @@ fun ReportSummaryScreen(
                     }
                 }
 
-                // Expense Card
                 Card(
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(containerColor = cardBackground),
@@ -245,7 +241,6 @@ fun ReportSummaryScreen(
                 }
             }
 
-            // Top Categories
             if (topCategories.isNotEmpty()) {
                 Text(
                     text = "Kategori Pengeluaran Teratas",
@@ -278,7 +273,6 @@ fun ReportSummaryScreen(
                 }
             }
 
-            // Rasio Keuangan
             Text(
                 text = "Rasio Keuangan",
                 color = primaryText,
@@ -408,17 +402,17 @@ private fun RatioItem(
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                label, 
-                color = primaryText, 
-                fontSize = 14.sp, 
+                label,
+                color = primaryText,
+                fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
-                description, 
-                color = secondaryText, 
+                description,
+                color = secondaryText,
                 fontSize = 12.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis

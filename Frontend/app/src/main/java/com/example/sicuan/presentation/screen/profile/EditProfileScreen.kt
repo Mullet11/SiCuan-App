@@ -87,7 +87,6 @@ fun EditProfileScreen(
         initialSelectedDateMillis = System.currentTimeMillis()
     )
 
-    // Setup Cropper
     val cropImageLauncher = rememberLauncherForActivityResult(CropImageContract()) { result ->
         if (result.isSuccessful) {
             localPhotoUri = result.uriContent
@@ -141,7 +140,7 @@ fun EditProfileScreen(
     if (showPhotoBottomSheet) {
         ModalBottomSheet(
             onDismissRequest = { showPhotoBottomSheet = false },
-            containerColor = MaterialTheme.colorScheme.surfaceVariant, // Tampilan estetik
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
             dragHandle = { BottomSheetDefaults.DragHandle() }
         ) {
             Column(modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp)) {
@@ -177,7 +176,7 @@ fun EditProfileScreen(
                         }
                     }
                 }
-                
+
                 HorizontalDivider(color = Color.DarkGray, modifier = Modifier.padding(bottom = 8.dp))
 
                 BottomSheetMenuItem(
@@ -254,9 +253,9 @@ fun EditProfileScreen(
             ) {
                 Box(modifier = Modifier.padding(24.dp).background(darkBackground)) {
                     Button(
-                        onClick = { 
+                        onClick = {
                             val finalPhoto = if (isPhotoDeleted) "" else (localPhotoUri?.toString() ?: photoUrl)
-                            onSave(name, username, email, phone, dob, bio, finalPhoto) 
+                            onSave(name, username, email, phone, dob, bio, finalPhoto)
                         },
                         modifier = Modifier.fillMaxWidth().height(56.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = buttonColor),
@@ -280,7 +279,6 @@ fun EditProfileScreen(
         ) {
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Profile Picture Section
             Row(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
@@ -314,9 +312,9 @@ fun EditProfileScreen(
                     }
                 }
             }
-            
+
             Spacer(modifier = Modifier.height(16.dp))
-            
+
             Text(
                 text = "Edit foto atau avatar",
                 color = MaterialTheme.colorScheme.primary,
@@ -324,7 +322,7 @@ fun EditProfileScreen(
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.clickable { showPhotoBottomSheet = true }.padding(8.dp)
             )
-            
+
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = "Cuaners Level: Gold \uD83C\uDFC6",
@@ -337,7 +335,6 @@ fun EditProfileScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Minimalist Inputs
             MinimalistTextField(
                 label = "Nama Lengkap",
                 value = name,
@@ -365,7 +362,6 @@ fun EditProfileScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Phone Field with Custom Prefix Dropdown
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = "Nomor HP",
@@ -420,8 +416,7 @@ fun EditProfileScreen(
             )
 
             Spacer(modifier = Modifier.height(16.dp))
-            
-            // Tanggal Lahir (Read-only input that opens picker)
+
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = "Tanggal Lahir",
@@ -435,7 +430,7 @@ fun EditProfileScreen(
                     readOnly = true,
                     placeholder = { Text("DD/MM/YYYY", color = Color.DarkGray) },
                     modifier = Modifier.fillMaxWidth().clickable { showDatePicker = true },
-                    enabled = false, // Use enabled = false and clickable to intercept click
+                    enabled = false,
                     colors = OutlinedTextFieldDefaults.colors(
                         disabledTextColor = primaryText,
                         disabledBorderColor = borderColor,
@@ -452,7 +447,7 @@ fun EditProfileScreen(
 
 
 
-            Spacer(modifier = Modifier.height(100.dp)) // Extra space for bottom bar
+            Spacer(modifier = Modifier.height(100.dp))
         }
     }
 }

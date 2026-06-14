@@ -61,37 +61,34 @@ fun AddTransactionScreen(
         dateMillis: Long
     ) -> Unit
 ) {
-    var rawAmount by rememberSaveable(prefilledAmount) { 
-        mutableStateOf(prefilledAmount?.replace(Regex("[^\\d]"), "") ?: "") 
+    var rawAmount by rememberSaveable(prefilledAmount) {
+        mutableStateOf(prefilledAmount?.replace(Regex("[^\\d]"), "") ?: "")
     }
     var type by rememberSaveable { mutableStateOf(TransactionType.EXPENSE) }
-    
-    // Category Management
+
     var customCategories by rememberSaveable { mutableStateOf(listOf<String>()) }
     val defaultCategories = TransactionCategory.getCategoriesByType(type)
     val allCategories = defaultCategories + customCategories
-    var category by rememberSaveable(type, prefilledCategory) { 
-        mutableStateOf(prefilledCategory ?: allCategories.firstOrNull() ?: "Umum") 
+    var category by rememberSaveable(type, prefilledCategory) {
+        mutableStateOf(prefilledCategory ?: allCategories.firstOrNull() ?: "Umum")
     }
-    
+
     var note by rememberSaveable(prefilledNote) { mutableStateOf(prefilledNote ?: "") }
     var merchantName by rememberSaveable(prefilledMerchant) { mutableStateOf(prefilledMerchant ?: "") }
-    
-    // Date Management
+
     var confirmedDateMillis by rememberSaveable(prefilledDateMillis) { mutableStateOf(prefilledDateMillis ?: System.currentTimeMillis()) }
     var tempDateMillis by remember { mutableStateOf(confirmedDateMillis) }
-    
-    // Dialog States
+
     var showCustomCategoryDialog by remember { mutableStateOf(false) }
     var newCategoryName by remember { mutableStateOf("") }
     var showDateTimeConfirmDialog by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
-    
+
     fun showDatePicker() {
         val calendar = Calendar.getInstance()
         calendar.timeInMillis = tempDateMillis
-        
+
         DatePickerDialog(
             context,
             { _, year, month, dayOfMonth ->
@@ -109,7 +106,7 @@ fun AddTransactionScreen(
     fun showTimePicker() {
         val calendar = Calendar.getInstance()
         calendar.timeInMillis = tempDateMillis
-        
+
         TimePickerDialog(
             context,
             { _, hourOfDay, minute ->
@@ -117,12 +114,12 @@ fun AddTransactionScreen(
                 newCalendar.timeInMillis = tempDateMillis
                 newCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
                 newCalendar.set(Calendar.MINUTE, minute)
-                newCalendar.set(Calendar.SECOND, 0) // reset second when manually picking
+                newCalendar.set(Calendar.SECOND, 0)
                 tempDateMillis = newCalendar.timeInMillis
             },
             calendar.get(Calendar.HOUR_OF_DAY),
             calendar.get(Calendar.MINUTE),
-            true // 24 hour view
+            true
         ).show()
     }
 
@@ -131,7 +128,6 @@ fun AddTransactionScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        // --- HEADER ---
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -156,7 +152,6 @@ fun AddTransactionScreen(
             )
         }
 
-        // --- BODY (SCROLLABLE) ---
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -164,7 +159,6 @@ fun AddTransactionScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = SiCuanDimens.SpacingLg)
         ) {
-            // Segmented Button (Pengeluaran / Pemasukan)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -189,14 +183,13 @@ fun AddTransactionScreen(
 
             Spacer(modifier = Modifier.height(SiCuanDimens.SpacingXl))
 
-            // Nominal Input (Giant Text)
             Box(
                 modifier = Modifier.fillMaxWidth().padding(vertical = SiCuanDimens.SpacingMd),
                 contentAlignment = Alignment.Center
             ) {
                 BasicTextField(
                     value = rawAmount,
-                    onValueChange = { 
+                    onValueChange = {
                         if (it.all { char -> char.isDigit() }) {
                             rawAmount = it
                             onClearMessage()
@@ -267,7 +260,6 @@ fun AddTransactionScreen(
 
             Spacer(modifier = Modifier.height(SiCuanDimens.SpacingLg))
 
-            // Keterangan Input
             OutlinedTextField(
                 value = note,
                 onValueChange = { note = it; onClearMessage() },
@@ -286,15 +278,13 @@ fun AddTransactionScreen(
 
             Spacer(modifier = Modifier.height(SiCuanDimens.SpacingLg))
 
-            // Pilih Tanggal
             Text(
                 text = "WAKTU TRANSAKSI",
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(modifier = Modifier.height(SiCuanDimens.SpacingSm))
-            
-            // Display currently confirmed date
+
             val sdfConfirmed = SimpleDateFormat("EEEE, dd MMM yyyy - HH:mm:ss", Locale("id", "ID"))
             Text(
                 text = sdfConfirmed.format(Date(confirmedDateMillis)),
@@ -316,9 +306,9 @@ fun AddTransactionScreen(
                     modifier = Modifier
                         .clip(RoundedCornerShape(SiCuanDimens.CardRadius))
                         .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
-                        .clickable { 
+                        .clickable {
                             tempDateMillis = confirmedDateMillis
-                            showDateTimeConfirmDialog = true 
+                            showDateTimeConfirmDialog = true
                         }
                         .padding(horizontal = SiCuanDimens.SpacingMd, vertical = SiCuanDimens.SpacingSm),
                     contentAlignment = Alignment.Center
@@ -334,7 +324,6 @@ fun AddTransactionScreen(
 
             Spacer(modifier = Modifier.height(SiCuanDimens.SpacingLg))
 
-            // Kategori
             Text(
                 text = "KATEGORI",
                 style = MaterialTheme.typography.labelMedium,
@@ -371,11 +360,10 @@ fun AddTransactionScreen(
                     )
                 }
             }
-            
+
             Spacer(modifier = Modifier.height(SiCuanDimens.SpacingXl))
         }
 
-        // --- FIXED FOOTER BUTTON ---
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -405,9 +393,7 @@ fun AddTransactionScreen(
         }
     }
 
-    // --- DIALOGS ---
 
-    // 1. Custom Category Dialog
     if (showCustomCategoryDialog) {
         AlertDialog(
             onDismissRequest = { showCustomCategoryDialog = false },
@@ -440,7 +426,6 @@ fun AddTransactionScreen(
         )
     }
 
-    // 2. DateTime Confirmation Dialog
     if (showDateTimeConfirmDialog) {
         AlertDialog(
             onDismissRequest = { showDateTimeConfirmDialog = false },
@@ -453,10 +438,10 @@ fun AddTransactionScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    
+
                     val sdfDate = SimpleDateFormat("EEEE, dd MMM yyyy", Locale("id", "ID"))
                     val sdfTime = SimpleDateFormat("HH:mm:ss", Locale("id", "ID"))
-                    
+
                     Text(
                         text = sdfDate.format(Date(tempDateMillis)),
                         style = MaterialTheme.typography.titleMedium,
@@ -466,9 +451,9 @@ fun AddTransactionScreen(
                         text = "Jam: ${sdfTime.format(Date(tempDateMillis))}",
                         style = MaterialTheme.typography.bodyLarge
                     )
-                    
+
                     Spacer(modifier = Modifier.height(16.dp))
-                    
+
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween

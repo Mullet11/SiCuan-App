@@ -74,7 +74,7 @@ fun ProfileScreen(
         containerColor = darkBackground,
         topBar = {
             TopAppBar(
-                title = { 
+                title = {
                     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                         Text("Profil Kamu", color = primaryText, fontWeight = FontWeight.Bold)
                     }
@@ -85,7 +85,7 @@ fun ProfileScreen(
                     }
                 },
                 actions = {
-                    Spacer(modifier = Modifier.width(48.dp)) // To balance center title
+                    Spacer(modifier = Modifier.width(48.dp))
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = darkBackground)
             )
@@ -101,7 +101,6 @@ fun ProfileScreen(
         ) {
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Profile Picture & Name
             Box(contentAlignment = Alignment.BottomEnd) {
                 if (firebaseAuthUiState.photoUrl != null) {
                     AsyncImage(
@@ -139,7 +138,7 @@ fun ProfileScreen(
                     Icon(Icons.Default.Edit, contentDescription = "Edit Profile", tint = Color.White, modifier = Modifier.size(16.dp))
                 }
             }
-            
+
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
@@ -166,7 +165,6 @@ fun ProfileScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // AKUN SAYA
             ProfileSectionLabel("AKUN SAYA")
             Card(
                 shape = RoundedCornerShape(16.dp),
@@ -190,7 +188,6 @@ fun ProfileScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // FITUR PINTAR
             ProfileSectionLabel("FITUR PINTAR")
             Card(
                 shape = RoundedCornerShape(16.dp),
@@ -206,7 +203,6 @@ fun ProfileScreen(
                             isSmartNotifEnabled = it
                             prefs.edit().putBoolean("smart_notif_enabled", it).apply()
                             if (it) {
-                                // Aktifkan ulang worker
                                 val workRequest = androidx.work.PeriodicWorkRequestBuilder<com.example.sicuan.worker.ReminderWorker>(6, java.util.concurrent.TimeUnit.HOURS).build()
                                 androidx.work.WorkManager.getInstance(context).enqueueUniquePeriodicWork(
                                     "SmartReminderWorker",
@@ -214,7 +210,6 @@ fun ProfileScreen(
                                     workRequest
                                 )
                             } else {
-                                // Matikan worker
                                 androidx.work.WorkManager.getInstance(context).cancelUniqueWork("SmartReminderWorker")
                             }
                         }
@@ -226,14 +221,12 @@ fun ProfileScreen(
                         isChecked = isBiometricEnabled,
                         onCheckedChange = { enabled ->
                             if (enabled) {
-                                // Cek apakah perangkat support biometric
                                 val biometricManager = androidx.biometric.BiometricManager.from(context)
                                 val canAuth = biometricManager.canAuthenticate(androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG or androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_WEAK)
                                 if (canAuth == androidx.biometric.BiometricManager.BIOMETRIC_SUCCESS) {
                                     isBiometricEnabled = true
                                     prefs.edit().putBoolean("biometric_enabled", true).apply()
                                 } else {
-                                    // Perangkat tidak support
                                     isBiometricEnabled = false
                                 }
                             } else {
@@ -247,7 +240,6 @@ fun ProfileScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // KEUANGAN
             ProfileSectionLabel("KEUANGAN")
             Card(
                 shape = RoundedCornerShape(16.dp),
@@ -263,7 +255,6 @@ fun ProfileScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // LAINNYA
             ProfileSectionLabel("LAINNYA")
             Card(
                 shape = RoundedCornerShape(16.dp),
@@ -388,9 +379,9 @@ fun ProfileMenuAnimatedToggle(
         ) { targetIcon ->
             Icon(targetIcon, contentDescription = null, tint = primaryText, modifier = Modifier.size(24.dp))
         }
-        
+
         Spacer(modifier = Modifier.width(16.dp))
-        
+
         AnimatedContent(
             targetState = textMode,
             transitionSpec = {
