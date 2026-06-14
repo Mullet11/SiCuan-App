@@ -129,23 +129,6 @@ Contoh folder:
 
 ## Fitur yang Direncanakan
 
-### Fitur Wajib UAS
-
-* Minimal 6 screen aplikasi
-* List transaksi recycle-able menggunakan LazyColumn
-* State management menggunakan ViewModel
-* MVVM
-* Clean Architecture
-* Fetching data dari API pihak ketiga
-* Local database menggunakan Room
-* BREAD transaksi:
-
-    * Browse transaksi
-    * Read detail transaksi
-    * Edit transaksi
-    * Add transaksi
-    * Delete transaksi
-
 ### Fitur Utama SiCuan
 
 * Dashboard keuangan
@@ -166,36 +149,6 @@ Contoh folder:
 * Edukasi finansial
 * Asisten AI keuangan
 
-## Progress Pengembangan
-
-### Day 1 - Project Setup
-
-Status: Selesai
-
-Yang sudah dikerjakan:
-
-* Setup dependency utama
-* Setup struktur folder Clean Architecture
-* Setup theme dan resource SiCuan
-* Setup komponen UI dasar
-* Setup Navigation Compose
-* Membuat route screen
-* Membuat skeleton screen aplikasi
-* Menghubungkan MainActivity dengan SiCuanNavGraph
-* Aplikasi berhasil dijalankan tanpa crash
-
-Screen yang sudah dibuat:
-
-* Splash Screen
-* Dashboard Screen
-* Transaction List Screen
-* Add Transaction Screen
-* Transaction Detail Screen
-* Edit Transaction Screen
-* Budget Screen
-* Insight Screen
-* Profile Screen
-
 ## Cara Menjalankan Project
 
 1. Clone repository ini.
@@ -205,23 +158,3 @@ Screen yang sudah dibuat:
 5. Jalankan aplikasi pada emulator atau perangkat Android.
 6. Pastikan aplikasi terbuka dari Splash Screen dan dapat berpindah ke Dashboard.
 
-## Branching Strategy
-
-Repository menggunakan strategi branch:
-
-* `main`: branch stabil untuk versi final
-* `develop`: branch integrasi pengembangan
-* `feature/*`: branch pengerjaan fitur
-
-Contoh branch:
-
-```text
-feature/day-1-project-setup
-feature/transaction-bread
-feature/room-database
-feature/api-insight
-```
-
-## Status Saat Ini
-
-Aplikasi masih berada pada tahap awal pengembangan. Fitur yang sudah tersedia saat ini adalah pondasi UI, theme, navigation, dan screen skeleton. Fitur database, BREAD transaksi, API, dan logic ViewModel akan dikerjakan pada tahap berikutnya.
