@@ -71,7 +71,7 @@ fun SiCuanNavGraph(
     val firebaseAuthUseCases = remember { AppModule.provideFirebaseAuthUseCases() }
     val supabaseStorageRepository = remember { AppModule.provideSupabaseStorageRepository() }
     val sharedPreferences = remember { context.getSharedPreferences("sicuan_user_prefs", android.content.Context.MODE_PRIVATE) }
-    
+
     val firebaseAuthViewModel: FirebaseAuthViewModel = viewModel(
         factory = FirebaseAuthViewModelFactory(firebaseAuthUseCases, supabaseStorageRepository, sharedPreferences)
     )
@@ -112,7 +112,7 @@ fun SiCuanNavGraph(
     val pinRepository = remember {
         AppModule.providePinRepository(context)
     }
-    
+
     val pinAuthViewModel: PinAuthViewModel = viewModel(
         factory = PinAuthViewModelFactory(pinRepository, sharedPreferences)
     )
@@ -263,7 +263,19 @@ fun SiCuanNavGraph(
             }
 
             composable(Screen.Education.route) {
-                EducationScreen(
+                com.example.sicuan.presentation.screen.insight.EducationScreen(
+                    userName = firebaseAuthUiState.displayName ?: firebaseAuthUiState.username ?: "Pengguna",
+                    photoUrl = firebaseAuthUiState.photoUrl,
+                    dob = firebaseAuthUiState.dob,
+                    onNavigateToQuiz = { navController.navigate(Screen.Quiz.route) },
+                    onBack = { navController.popBackStack() }
+                )
+            }
+
+            composable(Screen.Quiz.route) {
+                com.example.sicuan.presentation.screen.education.EducationScreen(
+                    userName = firebaseAuthUiState.displayName ?: firebaseAuthUiState.username ?: "Pengguna",
+                    photoUrl = firebaseAuthUiState.photoUrl,
                     onBack = { navController.popBackStack() }
                 )
             }
@@ -530,7 +542,6 @@ fun SiCuanNavGraph(
                         navController.popBackStack()
                     },
                     onPhotoSelected = { uri ->
-                        // Optional: if you want to handle photo saving globally
                     },
                     onBack = { navController.popBackStack() }
                 )

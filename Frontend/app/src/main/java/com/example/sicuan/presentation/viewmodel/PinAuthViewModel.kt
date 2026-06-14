@@ -51,7 +51,7 @@ class PinAuthViewModel(
         if (currentInput.length < 6) {
             val newInput = currentInput + number
             _uiState.update { it.copy(currentPinInput = newInput, errorMessage = null) }
-            
+
             if (newInput.length == 6) {
                 processCompletePin(newInput)
             }
@@ -61,11 +61,11 @@ class PinAuthViewModel(
     fun onBackspaceClick() {
         val currentInput = _uiState.value.currentPinInput
         if (currentInput.isNotEmpty()) {
-            _uiState.update { 
+            _uiState.update {
                 it.copy(
                     currentPinInput = currentInput.dropLast(1),
                     errorMessage = null
-                ) 
+                )
             }
         }
     }
@@ -77,42 +77,39 @@ class PinAuthViewModel(
     private fun processCompletePin(pin: String) {
         viewModelScope.launch {
             val state = _uiState.value
-            
+
             if (state.isSettingUpPin) {
                 if (!state.isConfirmingPin) {
-                    // First time entering new PIN
-                    _uiState.update { 
+                    _uiState.update {
                         it.copy(
                             currentPinInput = "",
                             isConfirmingPin = true,
                             initialPinSetup = pin
-                        ) 
+                        )
                     }
                 } else {
-                    // Confirming new PIN
                     if (pin == state.initialPinSetup) {
                         pinRepository.savePin(pin)
                         _uiState.update { it.copy(isAuthenticated = true) }
                     } else {
-                        _uiState.update { 
+                        _uiState.update {
                             it.copy(
                                 currentPinInput = "",
                                 errorMessage = "PIN tidak cocok. Silakan coba lagi."
-                            ) 
+                            )
                         }
                     }
                 }
             } else {
-                // Authenticating existing PIN
                 val savedPin = pinRepository.getPin()
                 if (pin == savedPin) {
                     _uiState.update { it.copy(isAuthenticated = true) }
                 } else {
-                    _uiState.update { 
+                    _uiState.update {
                         it.copy(
                             currentPinInput = "",
                             errorMessage = "PIN salah"
-                        ) 
+                        )
                     }
                 }
             }

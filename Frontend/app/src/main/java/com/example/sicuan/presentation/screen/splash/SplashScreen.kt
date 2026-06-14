@@ -25,7 +25,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-// Unused imports removed
 import com.example.sicuan.R
 import com.example.sicuan.presentation.component.SiCuanPrimaryButton
 import com.example.sicuan.ui.theme.SiCuanDimens
@@ -64,11 +63,10 @@ fun SplashScreen(
     LaunchedEffect(Unit) {
         delay(200)
         isLogoVisible = true
-        // Play sound when logo appears
         mediaPlayer?.start()
         delay(400)
         isTextVisible = true
-        delay(1200) // Tunggu lagu berjalan sebelum memunculkan tombol
+        delay(1200)
         isButtonVisible = true
     }
 
@@ -97,9 +95,9 @@ fun SplashScreen(
                     .offset(y = offsetY.dp)
             )
         }
-        
+
         Spacer(modifier = Modifier.height(SiCuanDimens.SpacingXl))
-        
+
         AnimatedVisibility(
             visible = isTextVisible,
             enter = fadeIn(animationSpec = tween(800)) + slideInVertically(
@@ -113,7 +111,7 @@ fun SplashScreen(
                     style = MaterialTheme.typography.displayMedium.copy(fontWeight = FontWeight.ExtraBold),
                     color = MaterialTheme.colorScheme.primary
                 )
-                
+
                 Spacer(modifier = Modifier.height(SiCuanDimens.SpacingSm))
 
                 Text(

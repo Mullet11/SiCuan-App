@@ -27,7 +27,6 @@ class ReminderWorker(
     }
 
     override suspend fun doWork(): Result {
-        // Cek apakah smart notifications diaktifkan user
         val prefs = applicationContext.getSharedPreferences("sicuan_user_prefs", Context.MODE_PRIVATE)
         val isSmartNotifEnabled = prefs.getBoolean("smart_notif_enabled", true)
         if (!isSmartNotifEnabled) return Result.success()
@@ -37,14 +36,12 @@ class ReminderWorker(
 
         createNotificationChannels()
 
-        // 1. Cek apakah ada transaksi dalam 24 jam terakhir
         val twentyFourHoursAgo = System.currentTimeMillis() - (24 * 60 * 60 * 1000)
         val recentCount = transactionDao.getTransactionCountAfterDate(twentyFourHoursAgo)
         if (recentCount == 0) {
             showReminderNotification()
         }
 
-        // 2. Cek pengeluaran vs pemasukan bulan ini
         val calendar = Calendar.getInstance()
         calendar.set(Calendar.DAY_OF_MONTH, 1)
         calendar.set(Calendar.HOUR_OF_DAY, 0)

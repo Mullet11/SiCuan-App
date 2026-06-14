@@ -15,7 +15,6 @@ class SupabaseStorageRepositoryImpl(
     private val client: OkHttpClient
 ) : SupabaseStorageRepository {
 
-    // Kunci API yang diberikan pengguna
     private val supabaseUrl = "https://dfwsscbofavswxtbtpwb.supabase.co"
     private val supabaseKey = "sb_publishable_OQ62BI_eOLZyuZrHpSKXgA_FXBVj5cU"
     private val bucketName = "profile_pictures"
@@ -29,13 +28,12 @@ class SupabaseStorageRepositoryImpl(
                 .url("$supabaseUrl/storage/v1/object/$bucketName/$fileName")
                 .addHeader("Authorization", "Bearer $supabaseKey")
                 .addHeader("apikey", supabaseKey)
-                .post(requestBody) // Use POST to upload
+                .post(requestBody)
                 .build()
 
             val response = client.newCall(request).execute()
 
             if (response.isSuccessful) {
-                // If successful, return the public URL
                 val publicUrl = "$supabaseUrl/storage/v1/object/public/$bucketName/$fileName"
                 Result.success(publicUrl)
             } else {

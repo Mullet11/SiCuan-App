@@ -44,10 +44,10 @@ fun TotalSaldoCard(
                 color = MaterialTheme.colorScheme.onSurface
             )
             Spacer(modifier = Modifier.height(SiCuanDimens.SpacingLg))
-            
+
             HorizontalDivider(color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f))
             Spacer(modifier = Modifier.height(SiCuanDimens.SpacingMd))
-            
+
             Text(
                 text = "Pemasukan Bulan Ini",
                 style = MaterialTheme.typography.bodySmall,
@@ -102,12 +102,11 @@ fun AnalisisCuanCard(
                 )
             }
             Spacer(modifier = Modifier.height(SiCuanDimens.SpacingMd))
-            
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Kiri: Circular progress + status
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Box(contentAlignment = Alignment.Center) {
                         CircularProgressIndicator(
@@ -131,10 +130,9 @@ fun AnalisisCuanCard(
                         color = statusColor
                     )
                 }
-                
+
                 Spacer(modifier = Modifier.width(SiCuanDimens.SpacingLg))
-                
-                // Kanan: Target berjalan terdekat
+
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = "Target Berjalan",

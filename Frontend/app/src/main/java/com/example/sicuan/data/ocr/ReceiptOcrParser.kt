@@ -111,7 +111,6 @@ object ReceiptOcrParser {
                 val amountsOnSameLine = extractAmountsFromLine(line, isPriority = true)
                 priorityAmounts.addAll(amountsOnSameLine)
 
-                // Jika kata "Total" ada tapi angkanya terpisah di baris berikutnya oleh ML Kit
                 if (amountsOnSameLine.isEmpty() && i + 1 < lines.size) {
                     priorityAmounts.addAll(extractAmountsFromLine(lines[i + 1], isPriority = true))
                 }
@@ -122,7 +121,6 @@ object ReceiptOcrParser {
             val validPriority = priorityAmounts.filter { it <= 20_000_000.0 }
             if (validPriority.isNotEmpty()) {
                 val priorityMax = validPriority.maxOrNull()
-                // Cek apakah ada relasi matematika yang lebih valid di allAmounts
                 val allAmounts = lines.flatMap { extractAmountsFromLine(it, false) }.filter { it <= 20_000_000.0 }
                 val mathTotal = findMathTotal(allAmounts)
                 return mathTotal ?: priorityMax
@@ -148,7 +146,7 @@ object ReceiptOcrParser {
     private fun findMathTotal(amountsInOrder: List<Double>): Double? {
         val distinctAmounts = amountsInOrder.distinct()
         val sorted = distinctAmounts.sorted()
-        
+
         if (sorted.size >= 3) {
             val possibleTotals = mutableListOf<Double>()
             for (i in 0 until sorted.size - 2) {
@@ -161,15 +159,13 @@ object ReceiptOcrParser {
                             val idxA = amountsInOrder.indexOf(a)
                             val idxB = amountsInOrder.indexOf(b)
                             val idxC = amountsInOrder.indexOf(c)
-                            
+
                             val minIdxPart = Math.min(idxA, idxB)
                             val maxIdxPart = Math.max(idxA, idxB)
-                            
+
                             if (idxC > maxIdxPart) {
-                                // C muncul setelah A dan B (Subtotal + Pajak = Total)
                                 possibleTotals.add(c)
                             } else if (idxC in minIdxPart..maxIdxPart) {
-                                // C muncul di antara A dan B (Total + Kembalian = Cash)
                                 val total = if (idxA < idxB) a else b
                                 possibleTotals.add(total)
                             } else {
@@ -198,7 +194,7 @@ object ReceiptOcrParser {
                 parseMoney(matchResult.value)
             }
             .filter { amount ->
-                amount >= 100.0 // Abaikan angka terlalu kecil
+                amount >= 100.0
             }
             .toList()
     }
@@ -272,7 +268,6 @@ object ReceiptOcrParser {
                     return date.time
                 }
             } catch (_: Exception) {
-                // Abaikan format yang tidak cocok.
             }
         }
 
@@ -286,19 +281,19 @@ object ReceiptOcrParser {
 
     private fun guessCategory(merchant: String): String? {
         if (merchant.isBlank()) return null
-        
+
         val lowerMerchant = merchant.lowercase()
         val foodKeywords = listOf("resto", "cafe", "kopi", "warung", "makan", "ayam", "bakso", "kfc", "mcd", "starbucks", "mixue")
         val shoppingKeywords = listOf("indomaret", "alfamart", "supermarket", "mall", "mart", "toko", "grocery", "minimarket")
-        
+
         if (foodKeywords.any { lowerMerchant.contains(it) }) {
             return "Makan"
         }
-        
+
         if (shoppingKeywords.any { lowerMerchant.contains(it) }) {
             return "Belanja"
         }
-        
+
         return null
     }
 }

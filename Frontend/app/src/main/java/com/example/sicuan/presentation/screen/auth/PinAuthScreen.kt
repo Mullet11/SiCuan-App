@@ -44,14 +44,12 @@ fun PinAuthScreen(
         }
     }
 
-    // Tampilkan BiometricPrompt otomatis saat layar dibuka
     LaunchedEffect(uiState.isBiometricEnabled) {
         if (uiState.isBiometricEnabled && !uiState.isSettingUpPin) {
-            kotlinx.coroutines.delay(300) // Tunggu activity siap
+            kotlinx.coroutines.delay(300)
             try {
                 showBiometricPrompt(context as FragmentActivity, viewModel)
             } catch (_: Exception) {
-                // Activity belum siap, user bisa tekan tombol manual
             }
         }
     }
@@ -91,7 +89,6 @@ fun PinAuthScreen(
 
             Spacer(modifier = Modifier.height(SiCuanDimens.SpacingXl))
 
-            // PIN Dots
             Row(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -120,13 +117,12 @@ fun PinAuthScreen(
                 text = uiState.errorMessage ?: "",
                 style = MaterialTheme.typography.bodyMedium,
                 color = if (uiState.errorMessage != null) MaterialTheme.colorScheme.error else Color.Transparent,
-                modifier = Modifier.height(20.dp) // Fixed height to prevent layout shift
+                modifier = Modifier.height(20.dp)
             )
         }
 
         Spacer(modifier = Modifier.weight(1f))
 
-        // Numpad
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(SiCuanDimens.SpacingLg),
@@ -151,7 +147,6 @@ fun PinAuthScreen(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Tombol biometric (jika aktif & bukan setup PIN baru)
                 if (uiState.isBiometricEnabled && !uiState.isSettingUpPin) {
                     Box(
                         modifier = Modifier
@@ -198,7 +193,7 @@ fun PinAuthScreen(
                 }
             }
         }
-        
+
         Spacer(modifier = Modifier.height(SiCuanDimens.SpacingLg))
     }
 }
@@ -215,12 +210,10 @@ private fun showBiometricPrompt(activity: FragmentActivity, viewModel: PinAuthVi
 
             override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
                 super.onAuthenticationError(errorCode, errString)
-                // User cancelled or error — bisa input PIN manual
             }
 
             override fun onAuthenticationFailed() {
                 super.onAuthenticationFailed()
-                // Sidik jari tidak cocok — bisa coba lagi
             }
         }
     )

@@ -128,8 +128,7 @@ class FirebaseAuthViewModel(
         photoUrl: String? = null
     ) {
         val finalPhotoUrl = if (photoUrl == "") null else (photoUrl ?: _uiState.value.photoUrl)
-        
-        // Simpan username dll ke SharedPreferences
+
         val uid = _uiState.value.uid
         if (uid.isNotBlank()) {
             sharedPreferences.edit().apply {
@@ -141,7 +140,6 @@ class FirebaseAuthViewModel(
             }
         }
 
-        // Perbarui Firebase Auth untuk name dan photoUrl
         updateProfile(displayName = name, photoUrl = finalPhotoUrl)
 
         _uiState.update {
@@ -164,9 +162,8 @@ class FirebaseAuthViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             val result = supabaseStorageRepository.uploadProfilePicture(uid, file)
-            
+
             result.onSuccess { publicUrl ->
-                // Perbarui profil dengan URL baru
                 updateProfile(displayName = _uiState.value.displayName, photoUrl = publicUrl)
                 _uiState.update { it.copy(isLoading = false) }
             }.onFailure { exception ->
@@ -179,7 +176,7 @@ class FirebaseAuthViewModel(
         firebaseAuthUseCases.signOut()
         _uiState.update { FirebaseAuthUiState(isLoading = false, isSignedIn = false) }
     }
-    
+
     fun clearError() {
         _uiState.update { it.copy(errorMessage = null) }
     }

@@ -62,18 +62,17 @@ fun DashboardScreen(
         .map { CategorySummary(it.key, it.value.sumOf { tx -> tx.amount }) }
         .sortedByDescending { it.totalAmount }
 
-    // Logika analisis keuangan yang diperbaiki
     val expenseRatio = if (totalIncome > 0) (totalExpense / totalIncome) else 0.0
     val analysisScore = when {
         totalIncome == 0.0 && totalExpense == 0.0 -> 0f
-        expenseRatio <= 0.4 -> ((1.0 - expenseRatio) * 100).toFloat().coerceIn(0f, 100f) // Sangat Baik
-        expenseRatio <= 0.6 -> ((1.0 - expenseRatio) * 100).toFloat().coerceIn(0f, 100f) // Baik
-        expenseRatio <= 0.8 -> ((1.0 - expenseRatio) * 100).toFloat().coerceIn(0f, 100f) // Cukup Baik
-        expenseRatio <= 1.0 -> ((1.0 - expenseRatio) * 100).toFloat().coerceIn(0f, 100f) // Perlu Perhatian
-        else -> (Math.max(0.0, 1.0 - expenseRatio) * 100).toFloat().coerceIn(0f, 100f)   // Buruk
+        expenseRatio <= 0.4 -> ((1.0 - expenseRatio) * 100).toFloat().coerceIn(0f, 100f)
+        expenseRatio <= 0.6 -> ((1.0 - expenseRatio) * 100).toFloat().coerceIn(0f, 100f)
+        expenseRatio <= 0.8 -> ((1.0 - expenseRatio) * 100).toFloat().coerceIn(0f, 100f)
+        expenseRatio <= 1.0 -> ((1.0 - expenseRatio) * 100).toFloat().coerceIn(0f, 100f)
+        else -> (Math.max(0.0, 1.0 - expenseRatio) * 100).toFloat().coerceIn(0f, 100f)
     }
     val analysisPercentage = (analysisScore / 100f).coerceIn(0f, 1f)
-    
+
     val statusText = when {
         totalIncome == 0.0 && totalExpense == 0.0 -> "Mulai Catat"
         expenseRatio <= 0.4 -> "Sangat Baik"
@@ -88,8 +87,7 @@ fun DashboardScreen(
         expenseRatio <= 0.8 -> MaterialTheme.colorScheme.secondary
         else -> MaterialTheme.colorScheme.error
     }
-    
-    // Cari target/plan dengan deadline terdekat yang belum lewat
+
     val now = System.currentTimeMillis()
     val nearestPlan = plans
         .filter { it.deadlineDateMillis > now }
@@ -112,7 +110,7 @@ fun DashboardScreen(
             contentPadding = PaddingValues(
                 start = SiCuanDimens.SpacingLg,
                 end = SiCuanDimens.SpacingLg,
-                bottom = 100.dp // Padding for Bottom Navigation Bar
+                bottom = 100.dp
             ),
             verticalArrangement = Arrangement.spacedBy(SiCuanDimens.SpacingLg)
         ) {
@@ -183,7 +181,7 @@ fun DashboardScreen(
                     )
                 }
             }
-            
+
         }
 
         if (showCalculatorSheet) {
@@ -208,8 +206,7 @@ private fun RecentTransactionItemStyled(
     val amountColor = if (isExpense) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
     val iconContainerColor = if (isExpense) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.primaryContainer
     val iconColor = if (isExpense) MaterialTheme.colorScheme.onErrorContainer else MaterialTheme.colorScheme.onPrimaryContainer
-    
-    // Choose icon based on category rough matching
+
     val iconVector = when {
         transaction.category.contains("Makan", ignoreCase = true) -> Icons.Default.Fastfood
         transaction.category.contains("Belanja", ignoreCase = true) -> Icons.Default.ShoppingCart
@@ -224,7 +221,6 @@ private fun RecentTransactionItemStyled(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Icon Container
             Box(
                 modifier = Modifier
                     .size(48.dp)
@@ -238,10 +234,9 @@ private fun RecentTransactionItemStyled(
                     tint = iconColor
                 )
             }
-            
+
             Spacer(modifier = Modifier.width(SiCuanDimens.SpacingMd))
-            
-            // Text Content
+
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = transaction.title,
@@ -254,8 +249,7 @@ private fun RecentTransactionItemStyled(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            
-            // Amount
+
             Text(
                 text = "$amountPrefix${formatCurrency(transaction.amount)}",
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
@@ -276,7 +270,7 @@ private fun formatCurrency(amount: Double): String {
 @Composable
 private fun GoalCard(title: String, currentAmount: Double, targetAmount: Double) {
     val progress = if (targetAmount > 0) (currentAmount / targetAmount).toFloat().coerceIn(0f, 1f) else 0f
-    
+
     SiCuanCard(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -288,7 +282,7 @@ private fun GoalCard(title: String, currentAmount: Double, targetAmount: Double)
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                 color = MaterialTheme.colorScheme.onSurface
             )
-            
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -305,7 +299,7 @@ private fun GoalCard(title: String, currentAmount: Double, targetAmount: Double)
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            
+
             androidx.compose.material3.LinearProgressIndicator(
                 progress = { progress },
                 modifier = Modifier
@@ -315,7 +309,7 @@ private fun GoalCard(title: String, currentAmount: Double, targetAmount: Double)
                 color = MaterialTheme.colorScheme.primary,
                 trackColor = MaterialTheme.colorScheme.surfaceVariant
             )
-            
+
             Text(
                 text = "${(progress * 100).toInt()}% tercapai",
                 style = MaterialTheme.typography.labelSmall,

@@ -39,7 +39,7 @@ fun PlanScreen(
     photoUrl: String?,
     onNavigateToAddPlan: () -> Unit,
     onNavigateToPlanDetail: (Int) -> Unit,
-    onBack: () -> Unit // Note: Usually handled by bottom nav, but good to have
+    onBack: () -> Unit
 ) {
     val darkBackground = MaterialTheme.colorScheme.background
     val cardBackground = MaterialTheme.colorScheme.surfaceVariant
@@ -153,7 +153,7 @@ fun PlanScreen(
                                 modifier = Modifier.padding(top = 4.dp)
                             )
                         }
-                        
+
                         Button(
                             onClick = onNavigateToAddPlan,
                             colors = ButtonDefaults.buttonColors(containerColor = buttonColor),
@@ -206,9 +206,9 @@ fun PlanScreen(
             items(plans) { plan ->
                 PlanCard(plan = plan, onClick = { onNavigateToPlanDetail(plan.id) })
             }
-            
+
             item {
-                Spacer(modifier = Modifier.height(80.dp)) // Extra space for Bottom Nav
+                Spacer(modifier = Modifier.height(80.dp))
             }
         }
     }
@@ -222,7 +222,6 @@ fun PlanCard(plan: Plan, onClick: () -> Unit) {
     val primaryText = MaterialTheme.colorScheme.onBackground
     val secondaryText = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
 
-    // Smooth animation for progress
     var animationPlayed by remember { mutableStateOf(false) }
     val currentProgress by animateFloatAsState(
         targetValue = if (animationPlayed) plan.progressPercentage else 0f,
@@ -285,7 +284,7 @@ fun PlanCard(plan: Plan, onClick: () -> Unit) {
                         )
                     }
                 }
-                
+
                 Text(
                     text = "${(plan.progressPercentage * 100).toInt()}%",
                     color = primaryText,

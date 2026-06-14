@@ -44,18 +44,18 @@ fun OnboardingScreen(
 ) {
     val pages = listOf(
         OnboardingPage(
-            imageRes = R.drawable.ilustrasi_onboarding, // Use existing placeholder or proper illustration
+            imageRes = R.drawable.ilustrasi_onboarding,
             title = "Pantau Cuan Secara Visual",
             description = "Pahami pola pengeluaranmu lewat laporan grafik interaktif. Cari tahu ke mana uangmu pergi secara instan tanpa ribet."
         ),
         OnboardingPage(
             imageRes =
-                R.drawable.ilustrasi_onboarding_2, // Second illustration
+                R.drawable.ilustrasi_onboarding_2,
             title = "Catat Otomatis, Anti Ribet",
             description = "Tinggal foto struk belanja, biarkan sistem yang mencatat pengeluaranmu secara instan."
         ),
         OnboardingPage(
-            imageRes = R.drawable.ilustrasi_onboarding_3, // Third illustration
+            imageRes = R.drawable.ilustrasi_onboarding_3,
             title = "Asisten Finansial Pribadimu",
             description = "Dapatkan pengingat otomatis untuk mencatat transaksi dan tanyakan tips menghemat anggaran langsung dari asisten cerdas AI-mu."
         )
@@ -67,7 +67,7 @@ fun OnboardingScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF0B1914)) // Dark background
+            .background(Color(0xFF0B1914))
             .padding(SiCuanDimens.SpacingXl),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -115,7 +115,6 @@ fun OnboardingScreen(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Pager Indicators
         Row(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
@@ -165,7 +164,7 @@ fun OnboardingScreen(
                 )
             }
         }
-        
+
         Spacer(modifier = Modifier.height(16.dp))
     }
 }

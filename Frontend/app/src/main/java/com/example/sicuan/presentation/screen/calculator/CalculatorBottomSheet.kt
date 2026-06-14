@@ -74,17 +74,15 @@ private fun CalculatorContent(
     val convertedValue = remember(displayValue, baseCurrency, targetCurrency, rates) {
         val value = displayValue.toDoubleOrNull() ?: 0.0
         if (baseCurrency == targetCurrency) return@remember value
-        
-        // Find rate base -> target
+
         val directRate = rates.find { it.base == baseCurrency && it.quote == targetCurrency }?.rate
         if (directRate != null) return@remember value * directRate
 
         val reverseRate = rates.find { it.base == targetCurrency && it.quote == baseCurrency }?.rate
         if (reverseRate != null) return@remember value / reverseRate
 
-        // Through IDR
         val toIdr = if (baseCurrency == "IDR") 1.0 else {
-            rates.find { it.quote == "IDR" && it.base == baseCurrency }?.rate 
+            rates.find { it.quote == "IDR" && it.base == baseCurrency }?.rate
             ?: (1.0 / (rates.find { it.base == "IDR" && it.quote == baseCurrency }?.rate ?: 1.0))
         }
 
@@ -149,7 +147,7 @@ private fun CalculatorContent(
                 val num = displayValue.toDoubleOrNull() ?: 0.0
                 displayValue = formatResult(num / 100)
             }
-            else -> { // Numbers
+            else -> {
                 if (isNewInput) {
                     displayValue = input
                     isNewInput = false
@@ -165,7 +163,6 @@ private fun CalculatorContent(
             .fillMaxWidth()
             .padding(SiCuanDimens.SpacingLg)
     ) {
-        // Mode Switcher
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center
@@ -185,7 +182,6 @@ private fun CalculatorContent(
 
         Spacer(modifier = Modifier.height(SiCuanDimens.SpacingMd))
 
-        // Display Area
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -256,7 +252,6 @@ private fun CalculatorContent(
 
         Spacer(modifier = Modifier.height(SiCuanDimens.SpacingLg))
 
-        // Keypad
         val buttons = listOf(
             "C", "⌫", "%", "÷",
             "7", "8", "9", "×",
@@ -289,7 +284,7 @@ private fun CalculatorContent(
                 onUseResult(formatResult(resultToUse.toDoubleOrNull() ?: 0.0))
             }
         )
-        
+
         Spacer(modifier = Modifier.height(SiCuanDimens.SpacingLg))
     }
 }

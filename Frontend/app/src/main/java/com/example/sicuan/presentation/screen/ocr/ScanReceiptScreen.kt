@@ -49,7 +49,7 @@ import androidx.core.content.ContextCompat
 import com.example.sicuan.data.ocr.ReceiptOcrParser
 import com.example.sicuan.domain.model.TransactionCategory
 import com.example.sicuan.domain.model.TransactionType
-import com.example.sicuan.utils.PdfHelper
+import com.example.sicuan.util.PdfHelper
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
@@ -113,7 +113,6 @@ fun ScanReceiptScreen(
                 val text = visionText.text
                 if (text.isBlank()) {
                     isScanning = false
-                    // TODO: show error toast or message
                     return@addOnSuccessListener
                 }
 
@@ -162,7 +161,6 @@ fun ScanReceiptScreen(
                     processInputImage(image)
                 } else {
                     isScanning = false
-                    // Error parsing PDF
                 }
             }
         }
@@ -215,7 +213,6 @@ fun ScanReceiptScreen(
                 .padding(paddingValues)
         ) {
             if (hasCameraPermission) {
-                // Camera Preview
                 AndroidView(
                     factory = { ctx ->
                         PreviewView(ctx).apply {
@@ -226,7 +223,6 @@ fun ScanReceiptScreen(
                     modifier = Modifier.fillMaxSize()
                 )
 
-                // Scrim & Overlay
                 Canvas(modifier = Modifier.fillMaxSize()) {
                     val canvasWidth = size.width
                     val canvasHeight = size.height
@@ -239,7 +235,6 @@ fun ScanReceiptScreen(
                     val scanRect = Rect(Offset(rectLeft, rectTop), Size(rectWidth, rectHeight))
                     val cornerRadius = CornerRadius(24.dp.toPx(), 24.dp.toPx())
 
-                    // Draw dark scrim over everything except the scan box
                     val backgroundPath = Path().apply {
                         addRect(Rect(0f, 0f, canvasWidth, canvasHeight))
                         addRoundRect(androidx.compose.ui.geometry.RoundRect(
@@ -257,29 +252,23 @@ fun ScanReceiptScreen(
                         color = Color.Black.copy(alpha = 0.5f)
                     )
 
-                    // Draw the green corner brackets
                     val bracketLength = 40.dp.toPx()
                     val strokeWidth = 4.dp.toPx()
                     val greenColor = Color(0xFF4CAF50)
 
-                    // Top Left
                     drawLine(greenColor, Offset(rectLeft, rectTop), Offset(rectLeft + bracketLength, rectTop), strokeWidth)
                     drawLine(greenColor, Offset(rectLeft, rectTop), Offset(rectLeft, rectTop + bracketLength), strokeWidth)
 
-                    // Top Right
                     drawLine(greenColor, Offset(rectLeft + rectWidth, rectTop), Offset(rectLeft + rectWidth - bracketLength, rectTop), strokeWidth)
                     drawLine(greenColor, Offset(rectLeft + rectWidth, rectTop), Offset(rectLeft + rectWidth, rectTop + bracketLength), strokeWidth)
 
-                    // Bottom Left
                     drawLine(greenColor, Offset(rectLeft, rectTop + rectHeight), Offset(rectLeft + bracketLength, rectTop + rectHeight), strokeWidth)
                     drawLine(greenColor, Offset(rectLeft, rectTop + rectHeight), Offset(rectLeft, rectTop + rectHeight - bracketLength), strokeWidth)
 
-                    // Bottom Right
                     drawLine(greenColor, Offset(rectLeft + rectWidth, rectTop + rectHeight), Offset(rectLeft + rectWidth - bracketLength, rectTop + rectHeight), strokeWidth)
                     drawLine(greenColor, Offset(rectLeft + rectWidth, rectTop + rectHeight), Offset(rectLeft + rectWidth, rectTop + rectHeight - bracketLength), strokeWidth)
                 }
 
-                // Instruction Text
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -296,7 +285,6 @@ fun ScanReceiptScreen(
                     )
                 }
 
-                // Capture Button
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -312,17 +300,14 @@ fun ScanReceiptScreen(
                             .clickable { takePhoto() },
                         contentAlignment = Alignment.Center
                     ) {
-                        // Inner circle design or just blank
                     }
                 }
             } else {
-                // No permission
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text("Izin kamera diperlukan untuk fitur ini", color = Color.White)
                 }
             }
 
-            // Bottom Action Panel
             Box(
                 modifier = Modifier
                     .fillMaxSize(),
@@ -354,7 +339,6 @@ fun ScanReceiptScreen(
                 }
             }
 
-            // Loading Overlay
             if (isScanning) {
                 Box(
                     modifier = Modifier

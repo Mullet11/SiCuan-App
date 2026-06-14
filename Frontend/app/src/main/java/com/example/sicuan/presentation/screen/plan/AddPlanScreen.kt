@@ -39,14 +39,14 @@ fun AddPlanScreen(
 
     val context = LocalContext.current
     val calendar = Calendar.getInstance()
-    
+
     val datePickerDialog = DatePickerDialog(
         context,
         { _, year, month, dayOfMonth ->
             val selectedCalendar = Calendar.getInstance()
             selectedCalendar.set(year, month, dayOfMonth)
             deadlineMillis = selectedCalendar.timeInMillis
-            
+
             val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
             deadlineText = dateFormat.format(selectedCalendar.time)
         },
@@ -55,7 +55,6 @@ fun AddPlanScreen(
         calendar.get(Calendar.DAY_OF_MONTH)
     )
 
-    // Colors to match dark mode screenshot
     val darkBackground = MaterialTheme.colorScheme.background
     val cardBackground = MaterialTheme.colorScheme.surfaceVariant
     val inputBackground = MaterialTheme.colorScheme.surface
@@ -65,8 +64,6 @@ fun AddPlanScreen(
 
     LaunchedEffect(errorMessage) {
         if (errorMessage != null) {
-            // Can show snackbar if needed
-            // onClearMessage()
         }
     }
 
@@ -118,7 +115,7 @@ fun AddPlanScreen(
                 fontSize = 16.sp,
                 lineHeight = 24.sp
             )
-            
+
             if (errorMessage != null) {
                 Text(
                     text = errorMessage,
@@ -138,7 +135,6 @@ fun AddPlanScreen(
                     modifier = Modifier.padding(24.dp),
                     verticalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
-                    // Nama Target
                     Column {
                         Text("Nama Target", color = secondaryText, fontSize = 14.sp)
                         Spacer(modifier = Modifier.height(8.dp))
@@ -159,7 +155,6 @@ fun AddPlanScreen(
                         )
                     }
 
-                    // Target Nominal
                     Column {
                         Text("Target Nominal", color = secondaryText, fontSize = 14.sp)
                         Spacer(modifier = Modifier.height(8.dp))
@@ -193,7 +188,6 @@ fun AddPlanScreen(
                         )
                     }
 
-                    // Target Tercapai (Date)
                     Column {
                         Text("Target Tercapai", color = secondaryText, fontSize = 14.sp)
                         Spacer(modifier = Modifier.height(8.dp))

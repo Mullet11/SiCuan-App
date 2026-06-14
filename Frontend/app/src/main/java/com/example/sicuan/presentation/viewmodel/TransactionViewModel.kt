@@ -237,7 +237,6 @@ class TransactionViewModel(
         val currentDate = java.text.SimpleDateFormat("dd MMM yyyy, HH:mm", java.util.Locale("id", "ID")).format(java.util.Date())
         val state = _uiState.value
 
-        // Build category summaries from expense transactions
         val expenseTransactions = state.transactions.filter { it.type == com.example.sicuan.domain.model.TransactionType.EXPENSE }
         val totalExp = state.totalExpense.coerceAtLeast(1.0)
         val categoryMap = expenseTransactions.groupBy { it.category }

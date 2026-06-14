@@ -71,23 +71,20 @@ fun AiAssistantScreen(
     val chatHistory by viewModel.chatHistory.collectAsState()
     val isTyping by viewModel.isTyping.collectAsState()
     var currentInput by remember { mutableStateOf("") }
-    
+
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    
-    // Dummy History Sessions
+
     val historySessions = listOf("Hari ini", "Kemarin", "Bulan Lalu")
-    
+
     val listState = rememberLazyListState()
 
-    // Scroll to bottom when new message arrives
     LaunchedEffect(chatHistory.size, isTyping) {
         if (chatHistory.isNotEmpty()) {
             listState.animateScrollToItem(chatHistory.size + if (isTyping) 1 else 0)
         }
     }
 
-    // Prepare financial context
     val totalIncome = transactions.filter { it.type == TransactionType.INCOME }.sumOf { it.amount }
     val totalExpense = transactions.filter { it.type == TransactionType.EXPENSE }.sumOf { it.amount }
     val formatter = NumberFormat.getCurrencyInstance(Locale("id", "ID"))
@@ -106,7 +103,6 @@ fun AiAssistantScreen(
                     icon = { Icon(Icons.Default.AddComment, null) },
                     onClick = {
                         scope.launch { drawerState.close() }
-                        // TODO: Clear chat history in viewmodel
                     }
                 )
                 historySessions.forEach { session ->
@@ -161,7 +157,7 @@ fun AiAssistantScreen(
                 items(chatHistory) { message ->
                     ChatBubble(message = message)
                 }
-                
+
                 if (isTyping) {
                     item {
                         TypingIndicator()
@@ -169,7 +165,6 @@ fun AiAssistantScreen(
                 }
             }
 
-            // Input Area
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -202,7 +197,7 @@ fun AiAssistantScreen(
                     modifier = Modifier
                         .size(48.dp)
                         .background(
-                            if (currentInput.isNotBlank() && !isTyping) MaterialTheme.colorScheme.primary 
+                            if (currentInput.isNotBlank() && !isTyping) MaterialTheme.colorScheme.primary
                             else MaterialTheme.colorScheme.surfaceVariant,
                             CircleShape
                         ),
@@ -211,7 +206,7 @@ fun AiAssistantScreen(
                     Icon(
                         imageVector = Icons.Default.Send,
                         contentDescription = "Kirim",
-                        tint = if (currentInput.isNotBlank() && !isTyping) MaterialTheme.colorScheme.onPrimary 
+                        tint = if (currentInput.isNotBlank() && !isTyping) MaterialTheme.colorScheme.onPrimary
                                else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
