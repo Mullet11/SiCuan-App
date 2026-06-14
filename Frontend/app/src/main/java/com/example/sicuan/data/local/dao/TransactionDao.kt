@@ -35,4 +35,13 @@ interface TransactionDao {
 
     @Query("SELECT * FROM transactions ORDER BY date DESC, createdAt DESC LIMIT :limit")
     fun getRecentTransactions(limit: Int): Flow<List<TransactionEntity>>
+
+    @Query("SELECT COUNT(*) FROM transactions WHERE date >= :dateMillis")
+    suspend fun getTransactionCountAfterDate(dateMillis: Long): Int
+
+    @Query("SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE type = 'expense' AND date >= :dateMillis")
+    suspend fun getTotalExpenseAfterDate(dateMillis: Long): Double
+
+    @Query("SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE type = 'income' AND date >= :dateMillis")
+    suspend fun getTotalIncomeAfterDate(dateMillis: Long): Double
 }

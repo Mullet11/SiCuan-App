@@ -23,6 +23,8 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+import androidx.compose.foundation.background
+
 @Composable
 fun TransactionDetailScreen(
     transactionId: Int,
@@ -36,6 +38,7 @@ fun TransactionDetailScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .padding(SiCuanDimens.SpacingLg),
         verticalArrangement = Arrangement.spacedBy(SiCuanDimens.SpacingMd)
     ) {

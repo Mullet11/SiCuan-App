@@ -11,8 +11,6 @@ object ReceiptOcrParser {
         "total",
         "jumlah",
         "tagihan",
-        "bayar",
-        "tunai",
         "amount"
     )
 
@@ -70,6 +68,8 @@ object ReceiptOcrParser {
             }
         }
 
+        val category = guessCategory(merchant)
+
         return OcrReceiptResult(
             rawText = rawText,
             merchant = merchant,
@@ -77,7 +77,8 @@ object ReceiptOcrParser {
             dateText = parsedDate.dateText,
             dateMillis = parsedDate.dateMillis,
             title = title,
-            note = note
+            note = note,
+            category = category
         )
     }
 
@@ -100,44 +101,104 @@ object ReceiptOcrParser {
     }
 
     private fun findBestAmount(lines: List<String>): Double? {
-        val priorityLines = lines.filter { line ->
+        val priorityAmounts = mutableListOf<Double>()
+
+        for (i in lines.indices) {
+            val line = lines[i]
             val lowerLine = line.lowercase()
 
-            totalKeywords.any { keyword ->
-                lowerLine.contains(keyword)
+            if (totalKeywords.any { keyword -> lowerLine.contains(keyword) }) {
+                val amountsOnSameLine = extractAmountsFromLine(line, isPriority = true)
+                priorityAmounts.addAll(amountsOnSameLine)
+
+                // Jika kata "Total" ada tapi angkanya terpisah di baris berikutnya oleh ML Kit
+                if (amountsOnSameLine.isEmpty() && i + 1 < lines.size) {
+                    priorityAmounts.addAll(extractAmountsFromLine(lines[i + 1], isPriority = true))
+                }
             }
         }
 
-        val priorityAmounts = priorityLines.flatMap { line ->
-            extractAmountsFromLine(line)
-        }
-
         if (priorityAmounts.isNotEmpty()) {
-            return priorityAmounts.maxOrNull()
+            val validPriority = priorityAmounts.filter { it <= 20_000_000.0 }
+            if (validPriority.isNotEmpty()) {
+                val priorityMax = validPriority.maxOrNull()
+                // Cek apakah ada relasi matematika yang lebih valid di allAmounts
+                val allAmounts = lines.flatMap { extractAmountsFromLine(it, false) }.filter { it <= 20_000_000.0 }
+                val mathTotal = findMathTotal(allAmounts)
+                return mathTotal ?: priorityMax
+            }
         }
 
-        val nonDateLines = lines.filterNot { line ->
-            isLikelyDateLine(line)
+        val ignoredAmountKeywords = listOf("cash", "change", "kembali", "tunai", "npwp", "tel", "phone", "wa", "whatsapp", "diskon", "discount")
+
+        val validLines = lines.filterNot { line ->
+            isLikelyDateLine(line) || ignoredAmountKeywords.any { line.lowercase().contains(it) }
         }
 
-        val allAmounts = nonDateLines.flatMap { line ->
-            extractAmountsFromLine(line)
+        val allAmounts = validLines.flatMap { line ->
+            extractAmountsFromLine(line, isPriority = false)
         }
 
-        return allAmounts.maxOrNull()
+        val mathTotal = findMathTotal(allAmounts)
+        if (mathTotal != null) return mathTotal
+
+        return allAmounts.filter { it <= 20_000_000.0 }.maxOrNull()
     }
 
-    private fun extractAmountsFromLine(line: String): List<Double> {
-        val moneyRegex = Regex(
-            pattern = """(?i)(rp\s*)?\d{1,3}([.,]\d{3})+([.,]\d{2})?|\d{4,}"""
-        )
+    private fun findMathTotal(amountsInOrder: List<Double>): Double? {
+        val distinctAmounts = amountsInOrder.distinct()
+        val sorted = distinctAmounts.sorted()
+        
+        if (sorted.size >= 3) {
+            val possibleTotals = mutableListOf<Double>()
+            for (i in 0 until sorted.size - 2) {
+                for (j in i + 1 until sorted.size - 1) {
+                    for (k in j + 1 until sorted.size) {
+                        val a = sorted[i]
+                        val b = sorted[j]
+                        val c = sorted[k]
+                        if (Math.abs((a + b) - c) < 1.0) {
+                            val idxA = amountsInOrder.indexOf(a)
+                            val idxB = amountsInOrder.indexOf(b)
+                            val idxC = amountsInOrder.indexOf(c)
+                            
+                            val minIdxPart = Math.min(idxA, idxB)
+                            val maxIdxPart = Math.max(idxA, idxB)
+                            
+                            if (idxC > maxIdxPart) {
+                                // C muncul setelah A dan B (Subtotal + Pajak = Total)
+                                possibleTotals.add(c)
+                            } else if (idxC in minIdxPart..maxIdxPart) {
+                                // C muncul di antara A dan B (Total + Kembalian = Cash)
+                                val total = if (idxA < idxB) a else b
+                                possibleTotals.add(total)
+                            } else {
+                                possibleTotals.add(c)
+                            }
+                        }
+                    }
+                }
+            }
+            if (possibleTotals.isNotEmpty()) {
+                return possibleTotals.maxOrNull()
+            }
+        }
+        return null
+    }
+
+    private fun extractAmountsFromLine(line: String, isPriority: Boolean): List<Double> {
+        val moneyRegex = if (isPriority) {
+            Regex("""(?i)(?:rp\s*)?(?<!\d)[1-9]\d{0,2}(?:[.,]\d{3})+(?:[.,]\d{2})?(?!\d)|(?:rp\s*)?(?<!\d)[1-9]\d{2,7}(?!\d)""")
+        } else {
+            Regex("""(?i)(?:rp\s*)?(?<!\d)[1-9]\d{0,2}(?:[.,]\d{3})+(?:[.,]\d{2})?(?!\d)|(?:rp\s*)(?<!\d)[1-9]\d{2,7}(?!\d)""")
+        }
 
         return moneyRegex.findAll(line)
             .mapNotNull { matchResult ->
                 parseMoney(matchResult.value)
             }
             .filter { amount ->
-                amount >= 1000.0
+                amount >= 100.0 // Abaikan angka terlalu kecil
             }
             .toList()
     }
@@ -222,4 +283,22 @@ object ReceiptOcrParser {
         val dateText: String = "",
         val dateMillis: Long? = null
     )
+
+    private fun guessCategory(merchant: String): String? {
+        if (merchant.isBlank()) return null
+        
+        val lowerMerchant = merchant.lowercase()
+        val foodKeywords = listOf("resto", "cafe", "kopi", "warung", "makan", "ayam", "bakso", "kfc", "mcd", "starbucks", "mixue")
+        val shoppingKeywords = listOf("indomaret", "alfamart", "supermarket", "mall", "mart", "toko", "grocery", "minimarket")
+        
+        if (foodKeywords.any { lowerMerchant.contains(it) }) {
+            return "Makan"
+        }
+        
+        if (shoppingKeywords.any { lowerMerchant.contains(it) }) {
+            return "Belanja"
+        }
+        
+        return null
+    }
 }

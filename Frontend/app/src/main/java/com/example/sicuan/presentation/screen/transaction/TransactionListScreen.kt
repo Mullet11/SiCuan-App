@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.background
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
@@ -65,6 +66,7 @@ fun TransactionListScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .padding(SiCuanDimens.SpacingLg),
         verticalArrangement = Arrangement.spacedBy(SiCuanDimens.SpacingMd)
     ) {
@@ -182,6 +184,12 @@ private fun TransactionFilterChips(
                 onClick = {
                     onFilterSelected(FILTER_ALL)
                 },
+                colors = androidx.compose.material3.FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = MaterialTheme.colorScheme.secondary,
+                    selectedLabelColor = MaterialTheme.colorScheme.onSecondary,
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    labelColor = MaterialTheme.colorScheme.onSurface
+                ),
                 label = {
                     Text(text = "Semua")
                 }
@@ -192,6 +200,12 @@ private fun TransactionFilterChips(
                 onClick = {
                     onFilterSelected(FILTER_EXPENSE)
                 },
+                colors = androidx.compose.material3.FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = MaterialTheme.colorScheme.error,
+                    selectedLabelColor = MaterialTheme.colorScheme.onError,
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    labelColor = MaterialTheme.colorScheme.onSurface
+                ),
                 label = {
                     Text(text = "Pengeluaran")
                 }
@@ -202,6 +216,12 @@ private fun TransactionFilterChips(
                 onClick = {
                     onFilterSelected(FILTER_INCOME)
                 },
+                colors = androidx.compose.material3.FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = MaterialTheme.colorScheme.primary,
+                    selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    labelColor = MaterialTheme.colorScheme.onSurface
+                ),
                 label = {
                     Text(text = "Pemasukan")
                 }

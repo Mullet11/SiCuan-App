@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.background
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
@@ -108,6 +109,7 @@ fun EditTransactionScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .verticalScroll(rememberScrollState())
             .padding(SiCuanDimens.SpacingLg),
         verticalArrangement = Arrangement.spacedBy(SiCuanDimens.SpacingMd)
@@ -195,6 +197,12 @@ fun EditTransactionScreen(
                             TransactionCategory.getDefaultCategoryByType(TransactionType.EXPENSE)
                         onClearMessage()
                     },
+                    colors = androidx.compose.material3.FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = MaterialTheme.colorScheme.error,
+                        selectedLabelColor = MaterialTheme.colorScheme.onError,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        labelColor = MaterialTheme.colorScheme.onSurface
+                    ),
                     label = {
                         Text(text = "Pengeluaran")
                     }
@@ -208,6 +216,12 @@ fun EditTransactionScreen(
                             TransactionCategory.getDefaultCategoryByType(TransactionType.INCOME)
                         onClearMessage()
                     },
+                    colors = androidx.compose.material3.FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = MaterialTheme.colorScheme.primary,
+                        selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        labelColor = MaterialTheme.colorScheme.onSurface
+                    ),
                     label = {
                         Text(text = "Pemasukan")
                     }

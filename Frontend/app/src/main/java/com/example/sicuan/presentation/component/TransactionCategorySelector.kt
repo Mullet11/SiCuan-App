@@ -49,6 +49,12 @@ fun TransactionCategorySelector(
                     onClick = {
                         onCategorySelected(category)
                     },
+                    colors = androidx.compose.material3.FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = MaterialTheme.colorScheme.secondary,
+                        selectedLabelColor = MaterialTheme.colorScheme.onSecondary,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        labelColor = MaterialTheme.colorScheme.onSurface
+                    ),
                     label = {
                         Text(text = category)
                     }

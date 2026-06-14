@@ -12,14 +12,16 @@ import com.example.sicuan.domain.usecase.transaction.GetTotalAmountByTypeUseCase
 import com.example.sicuan.domain.usecase.transaction.GetTransactionByIdUseCase
 import com.example.sicuan.domain.usecase.transaction.TransactionUseCases
 import com.example.sicuan.domain.usecase.transaction.UpdateTransactionUseCase
-import com.example.sicuan.data.repository.BudgetRepositoryImpl
-import com.example.sicuan.domain.repository.BudgetRepository
-import com.example.sicuan.domain.usecase.budget.AddBudgetUseCase
-import com.example.sicuan.domain.usecase.budget.BudgetUseCases
-import com.example.sicuan.domain.usecase.budget.DeleteBudgetUseCase
-import com.example.sicuan.domain.usecase.budget.GetAllBudgetsUseCase
-import com.example.sicuan.domain.usecase.budget.GetBudgetByIdUseCase
-import com.example.sicuan.domain.usecase.budget.UpdateBudgetUseCase
+import com.example.sicuan.data.repository.PlanRepositoryImpl
+import com.example.sicuan.domain.repository.PlanRepository
+import com.example.sicuan.domain.usecase.plan.AddPlan
+import com.example.sicuan.domain.usecase.plan.DeletePlan
+import com.example.sicuan.domain.usecase.plan.GetPlans
+import com.example.sicuan.domain.usecase.plan.PlanUseCases
+import com.example.sicuan.domain.usecase.plan.TopUpPlan
+import com.example.sicuan.domain.usecase.plan.UpdatePlan
+import com.example.sicuan.domain.usecase.plan.WithdrawPlan
+import com.example.sicuan.domain.usecase.plan.GetPlanHistory
 import com.example.sicuan.data.remote.api.CurrencyApiService
 import com.example.sicuan.data.remote.api.RetrofitClient
 import com.example.sicuan.data.repository.CurrencyRepositoryImpl
@@ -30,11 +32,16 @@ import com.example.sicuan.data.repository.FirebaseAuthRepositoryImpl
 import com.example.sicuan.domain.repository.FirebaseAuthRepository
 import com.example.sicuan.domain.usecase.auth.FirebaseAuthUseCases
 import com.example.sicuan.domain.usecase.auth.GetCurrentFirebaseUserUseCase
-import com.example.sicuan.domain.usecase.auth.SignInAnonymouslyUseCase
+import com.example.sicuan.domain.usecase.auth.SignInWithEmailAndPasswordUseCase
+import com.example.sicuan.domain.usecase.auth.SignUpWithEmailAndPasswordUseCase
+import com.example.sicuan.domain.usecase.auth.SignOutUseCase
 import com.google.firebase.auth.FirebaseAuth
 import com.example.sicuan.data.remote.firebase.FirestoreTransactionRemoteDataSource
 import com.google.firebase.firestore.FirebaseFirestore
-import com.example.sicuan.data.remote.firebase.FirestoreBudgetRemoteDataSource
+import com.example.sicuan.domain.usecase.auth.UpdateProfileUseCase
+import com.example.sicuan.data.repository.SupabaseStorageRepositoryImpl
+import com.example.sicuan.domain.repository.SupabaseStorageRepository
+import okhttp3.OkHttpClient
 
 object AppModule {
 
@@ -65,24 +72,26 @@ object AppModule {
         )
     }
 
-    fun provideBudgetRepository(context: Context): BudgetRepository {
+    fun providePlanRepository(context: Context): PlanRepository {
         val database = provideDatabase(context)
 
-        return BudgetRepositoryImpl(
-            budgetDao = database.budgetDao(),
-            firestoreBudgetRemoteDataSource = provideFirestoreBudgetRemoteDataSource()
+        return PlanRepositoryImpl(
+            dao = database.planDao(),
+            historyDao = database.planHistoryDao()
         )
     }
 
-    fun provideBudgetUseCases(context: Context): BudgetUseCases {
-        val repository = provideBudgetRepository(context)
+    fun providePlanUseCases(context: Context): PlanUseCases {
+        val repository = providePlanRepository(context)
 
-        return BudgetUseCases(
-            getAllBudgets = GetAllBudgetsUseCase(repository),
-            getBudgetById = GetBudgetByIdUseCase(repository),
-            addBudget = AddBudgetUseCase(repository),
-            updateBudget = UpdateBudgetUseCase(repository),
-            deleteBudget = DeleteBudgetUseCase(repository)
+        return PlanUseCases(
+            getPlans = GetPlans(repository),
+            addPlan = AddPlan(repository),
+            updatePlan = UpdatePlan(repository),
+            deletePlan = DeletePlan(repository),
+            topUpPlan = TopUpPlan(repository),
+            withdrawPlan = WithdrawPlan(repository),
+            getPlanHistory = GetPlanHistory(repository)
         )
     }
 
@@ -118,9 +127,20 @@ object AppModule {
         val repository = provideFirebaseAuthRepository()
 
         return FirebaseAuthUseCases(
-            signInAnonymously = SignInAnonymouslyUseCase(repository),
-            getCurrentFirebaseUser = GetCurrentFirebaseUserUseCase(repository)
+            signInWithEmailAndPassword = SignInWithEmailAndPasswordUseCase(repository),
+            signUpWithEmailAndPassword = SignUpWithEmailAndPasswordUseCase(repository),
+            signOut = SignOutUseCase(repository),
+            getCurrentFirebaseUser = GetCurrentFirebaseUserUseCase(repository),
+            updateProfile = UpdateProfileUseCase(repository)
         )
+    }
+
+    fun provideOkHttpClient(): OkHttpClient {
+        return OkHttpClient.Builder().build()
+    }
+
+    fun provideSupabaseStorageRepository(): SupabaseStorageRepository {
+        return SupabaseStorageRepositoryImpl(provideOkHttpClient())
     }
 
     fun provideFirebaseFirestore(): FirebaseFirestore {
@@ -134,10 +154,7 @@ object AppModule {
         )
     }
 
-    fun provideFirestoreBudgetRemoteDataSource(): FirestoreBudgetRemoteDataSource {
-        return FirestoreBudgetRemoteDataSource(
-            firestore = provideFirebaseFirestore(),
-            firebaseAuth = provideFirebaseAuth()
-        )
+    fun providePinRepository(context: Context): com.example.sicuan.domain.repository.PinRepository {
+        return com.example.sicuan.data.local.PinRepositoryImpl(context)
     }
 }

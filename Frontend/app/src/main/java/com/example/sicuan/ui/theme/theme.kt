@@ -33,7 +33,7 @@ private val LightColorScheme = lightColorScheme(
     surfaceVariant = SiCuanSurfaceContainerLight,
     onSurfaceVariant = SiCuanTextLight,
 
-    error = SiCuanDanger,
+    error = SiCuanDangerLight,
     onError = SiCuanTextDark,
 
     inverseSurface = SiCuanAccentLight,
@@ -59,7 +59,7 @@ private val DarkColorScheme = darkColorScheme(
     surfaceVariant = SiCuanSurfaceContainerDark,
     onSurfaceVariant = SiCuanTextDark,
 
-    error = SiCuanDanger,
+    error = SiCuanDangerDark,
     onError = SiCuanTextDark,
 
     inverseSurface = SiCuanAccentDark,

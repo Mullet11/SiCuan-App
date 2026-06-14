@@ -2,6 +2,9 @@ package com.example.sicuan.presentation.navigation
 
 sealed class Screen(val route: String) {
     data object Splash : Screen("splash")
+    data object Onboarding : Screen("onboarding")
+    data object Auth : Screen("auth")
+    data object PinAuth : Screen("pin_auth")
     data object Dashboard : Screen("dashboard")
 
     data object TransactionList : Screen("transaction_list")
@@ -24,7 +27,16 @@ sealed class Screen(val route: String) {
         }
     }
 
-    data object Budget : Screen("budget")
+    data object Plan : Screen("plan")
+    data object AddPlan : Screen("add_plan")
+    data object PlanDetail : Screen("plan_detail/{planId}") {
+        fun createRoute(planId: Int) = "plan_detail/$planId"
+    }
     data object Insight : Screen("insight")
     data object Profile : Screen("profile")
+    data object AiAssistant : Screen("ai_assistant")
+    data object Education : Screen("education")
+    data object EditProfile : Screen("edit_profile")
+    data object ChangePassword : Screen("change_password")
+    data object ReportSummary : Screen("report_summary")
 }

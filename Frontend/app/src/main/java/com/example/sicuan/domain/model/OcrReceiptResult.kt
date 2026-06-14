@@ -7,5 +7,6 @@ data class OcrReceiptResult(
     val dateText: String = "",
     val dateMillis: Long? = null,
     val title: String = "",
-    val note: String = ""
+    val note: String = "",
+    val category: String? = null
 )

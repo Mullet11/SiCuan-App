@@ -1,27 +1,40 @@
 package com.example.sicuan.presentation.screen.dashboard
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Fastfood
+import androidx.compose.material.icons.filled.Payments
+import androidx.compose.material.icons.filled.Receipt
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.outlined.CallMade
+import androidx.compose.material.icons.outlined.CallReceived
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import com.example.sicuan.domain.model.CurrencyRate
 import com.example.sicuan.domain.model.Transaction
 import com.example.sicuan.domain.model.TransactionType
-import com.example.sicuan.presentation.component.SiCuanCard
-import com.example.sicuan.presentation.component.SiCuanEmptyState
-import com.example.sicuan.presentation.component.SiCuanPrimaryButton
-import com.example.sicuan.presentation.component.SiCuanSecondaryButton
+import com.example.sicuan.presentation.component.*
 import com.example.sicuan.ui.theme.SiCuanDimens
 import java.text.NumberFormat
 import java.util.Locale
+
+import com.example.sicuan.domain.model.Plan
 
 @Composable
 fun DashboardScreen(
@@ -30,252 +43,285 @@ fun DashboardScreen(
     totalExpense: Double,
     allTransactions: List<Transaction>,
     recentTransactions: List<Transaction>,
+    currencyRates: List<CurrencyRate>,
+    plans: List<Plan>,
+    userName: String?,
+    photoUrl: String?,
     onNavigateToTransactions: () -> Unit,
-    onScanReceiptClick: () -> Unit,
+    onInputClick: (String?) -> Unit,
     onNavigateToTransactionDetail: (Int) -> Unit,
     onNavigateToBudget: () -> Unit,
     onNavigateToInsight: () -> Unit,
-    onNavigateToProfile: () -> Unit
+    onNavigateToProfile: () -> Unit,
+    onNavigateToAiAssistant: () -> Unit,
+    onNavigateToEdukasi: () -> Unit
 ) {
     val expenseCategorySummaries = allTransactions
-        .filter { transaction ->
-            transaction.type == TransactionType.EXPENSE
-        }
-        .groupBy { transaction ->
-            transaction.category.ifBlank { "Umum" }
-        }
-        .map { categoryGroup ->
-            CategorySummary(
-                category = categoryGroup.key,
-                totalAmount = categoryGroup.value.sumOf { transaction ->
-                    transaction.amount
-                }
-            )
-        }
-        .sortedByDescending { summary ->
-            summary.totalAmount
-        }
+        .filter { it.type == TransactionType.EXPENSE }
+        .groupBy { it.category.ifBlank { "Umum" } }
+        .map { CategorySummary(it.key, it.value.sumOf { tx -> tx.amount }) }
+        .sortedByDescending { it.totalAmount }
+
+    // Logika analisis keuangan yang diperbaiki
+    val expenseRatio = if (totalIncome > 0) (totalExpense / totalIncome) else 0.0
+    val analysisScore = when {
+        totalIncome == 0.0 && totalExpense == 0.0 -> 0f
+        expenseRatio <= 0.4 -> ((1.0 - expenseRatio) * 100).toFloat().coerceIn(0f, 100f) // Sangat Baik
+        expenseRatio <= 0.6 -> ((1.0 - expenseRatio) * 100).toFloat().coerceIn(0f, 100f) // Baik
+        expenseRatio <= 0.8 -> ((1.0 - expenseRatio) * 100).toFloat().coerceIn(0f, 100f) // Cukup Baik
+        expenseRatio <= 1.0 -> ((1.0 - expenseRatio) * 100).toFloat().coerceIn(0f, 100f) // Perlu Perhatian
+        else -> (Math.max(0.0, 1.0 - expenseRatio) * 100).toFloat().coerceIn(0f, 100f)   // Buruk
+    }
+    val analysisPercentage = (analysisScore / 100f).coerceIn(0f, 1f)
+    
+    val statusText = when {
+        totalIncome == 0.0 && totalExpense == 0.0 -> "Mulai Catat"
+        expenseRatio <= 0.4 -> "Sangat Baik"
+        expenseRatio <= 0.6 -> "Baik"
+        expenseRatio <= 0.8 -> "Cukup Baik"
+        expenseRatio <= 1.0 -> "Perlu Perhatian"
+        else -> "Buruk"
+    }
+    val statusColor = when {
+        totalIncome == 0.0 && totalExpense == 0.0 -> MaterialTheme.colorScheme.onSurfaceVariant
+        expenseRatio <= 0.6 -> MaterialTheme.colorScheme.primary
+        expenseRatio <= 0.8 -> MaterialTheme.colorScheme.secondary
+        else -> MaterialTheme.colorScheme.error
+    }
+    
+    // Cari target/plan dengan deadline terdekat yang belum lewat
+    val now = System.currentTimeMillis()
+    val nearestPlan = plans
+        .filter { it.deadlineDateMillis > now }
+        .minByOrNull { it.deadlineDateMillis }
+    val nearestPlanDaysLeft = nearestPlan?.let {
+        ((it.deadlineDateMillis - now) / (1000 * 60 * 60 * 24)).toInt()
+    } ?: 0
+
+    var showCalculatorSheet by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(SiCuanDimens.SpacingLg),
-        verticalArrangement = Arrangement.spacedBy(SiCuanDimens.SpacingMd)
+            .background(MaterialTheme.colorScheme.background)
     ) {
-        Text(
-            text = "Dashboard",
-            style = MaterialTheme.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.onBackground
-        )
+        SiCuanTopAppBar(userName = userName, photoUrl = photoUrl)
 
-        SiCuanCard {
-            Text(
-                text = "Saldo Saat Ini",
-                style = MaterialTheme.typography.titleMedium
-            )
-
-            Text(
-                text = formatCurrency(balance),
-                style = MaterialTheme.typography.headlineLarge,
-                color = if (balance < 0) {
-                    MaterialTheme.colorScheme.error
-                } else {
-                    MaterialTheme.colorScheme.primary
-                }
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(SiCuanDimens.SpacingMd)
-            ) {
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(
-                        text = "Pemasukan",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-
-                    Text(
-                        text = formatCurrency(totalIncome),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(
-                        text = "Pengeluaran",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-
-                    Text(
-                        text = formatCurrency(totalExpense),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-            }
-        }
-
-        Text(
-            text = "Ringkasan Pengeluaran",
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onBackground
-        )
-
-        if (expenseCategorySummaries.isEmpty()) {
-            SiCuanEmptyState(
-                title = "Belum ada pengeluaran",
-                message = "Tambahkan transaksi pengeluaran untuk melihat kategori pengeluaran terbesar."
-            )
-        } else {
-            SiCuanCard {
-                expenseCategorySummaries.forEach { summary ->
-                    CategorySummaryItem(
-                        summary = summary,
-                        totalExpense = totalExpense
-                    )
-                }
-            }
-        }
-
-        Text(
-            text = "Transaksi Terbaru",
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onBackground
-        )
-
-        if (recentTransactions.isEmpty()) {
-            SiCuanEmptyState(
-                title = "Belum ada transaksi",
-                message = "Tambahkan transaksi pertama untuk mulai memantau keuanganmu.",
-                actionText = "Tambah Transaksi",
-                onActionClick = onNavigateToTransactions
-            )
-        } else {
-            recentTransactions.forEach { transaction ->
-                RecentTransactionItem(
-                    transaction = transaction,
-                    onClick = {
-                        onNavigateToTransactionDetail(transaction.id)
-                    }
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(
+                start = SiCuanDimens.SpacingLg,
+                end = SiCuanDimens.SpacingLg,
+                bottom = 100.dp // Padding for Bottom Navigation Bar
+            ),
+            verticalArrangement = Arrangement.spacedBy(SiCuanDimens.SpacingLg)
+        ) {
+            item {
+                TotalSaldoCard(
+                    saldo = formatCurrency(balance),
+                    pemasukanBulanIni = "+ ${formatCurrency(totalIncome)}"
                 )
             }
+
+            item {
+                SiCuanActionButtons(
+                    onInputClick = { onInputClick(null) },
+                    onCalculatorClick = { showCalculatorSheet = true },
+                    onAiClick = onNavigateToAiAssistant,
+                    onEdukasiClick = onNavigateToEdukasi
+                )
+            }
+
+            item {
+                AnalisisCuanCard(
+                    percentage = analysisPercentage,
+                    statusText = statusText,
+                    statusColor = statusColor,
+                    nearestPlanTitle = nearestPlan?.title,
+                    nearestPlanProgress = nearestPlan?.progressPercentage ?: 0f,
+                    nearestPlanDaysLeft = nearestPlanDaysLeft,
+                    onCardClick = onNavigateToInsight
+                )
+            }
+
+
+
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Transaksi Terakhir",
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                    Text(
+                        text = "Lihat Semua",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.clickable { onNavigateToTransactions() }
+                    )
+                }
+            }
+
+            if (recentTransactions.isEmpty()) {
+                item {
+                    SiCuanEmptyState(
+                        title = "Belum ada transaksi",
+                        message = "Tambahkan transaksi pertama untuk mulai memantau keuanganmu.",
+                        actionText = "Tambah Transaksi",
+                        onActionClick = onNavigateToTransactions
+                    )
+                }
+            } else {
+                items(recentTransactions) { transaction ->
+                    RecentTransactionItemStyled(
+                        transaction = transaction,
+                        onClick = { onNavigateToTransactionDetail(transaction.id) }
+                    )
+                }
+            }
+            
         }
 
-        SiCuanPrimaryButton(
-            text = "Lihat Semua Transaksi",
-            onClick = onNavigateToTransactions
-        )
-
-        SiCuanSecondaryButton(
-            text = "Scan Struk OCR",
-            onClick = onScanReceiptClick
-        )
-
-        SiCuanSecondaryButton(
-            text = "Anggaran",
-            onClick = onNavigateToBudget
-        )
-
-        SiCuanSecondaryButton(
-            text = "Insight API",
-            onClick = onNavigateToInsight
-        )
-
-        SiCuanSecondaryButton(
-            text = "Profil",
-            onClick = onNavigateToProfile
-        )
+        if (showCalculatorSheet) {
+            com.example.sicuan.presentation.screen.calculator.CalculatorBottomSheet(
+                rates = currencyRates,
+                onDismissRequest = { showCalculatorSheet = false },
+                onUseResult = { result ->
+                    onInputClick(result)
+                }
+            )
+        }
     }
 }
 
 @Composable
-private fun CategorySummaryItem(
-    summary: CategorySummary,
-    totalExpense: Double
-) {
-    val percentage = if (totalExpense > 0) {
-        (summary.totalAmount / totalExpense) * 100
-    } else {
-        0.0
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = SiCuanDimens.SpacingSm),
-        verticalArrangement = Arrangement.spacedBy(SiCuanDimens.SpacingXs)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = summary.category,
-                style = MaterialTheme.typography.titleMedium
-            )
-
-            Text(
-                text = formatCurrency(summary.totalAmount),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.error
-            )
-        }
-
-        Text(
-            text = "${percentage.toInt()}% dari total pengeluaran",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-    }
-}
-
-@Composable
-private fun RecentTransactionItem(
+private fun RecentTransactionItemStyled(
     transaction: Transaction,
     onClick: () -> Unit
 ) {
-    val amountPrefix = if (transaction.type == TransactionType.EXPENSE) "-" else "+"
-    val amountColor = if (transaction.type == TransactionType.EXPENSE) {
-        MaterialTheme.colorScheme.error
-    } else {
-        MaterialTheme.colorScheme.primary
+    val isExpense = transaction.type == TransactionType.EXPENSE
+    val amountPrefix = if (isExpense) "-" else "+"
+    val amountColor = if (isExpense) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+    val iconContainerColor = if (isExpense) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.primaryContainer
+    val iconColor = if (isExpense) MaterialTheme.colorScheme.onErrorContainer else MaterialTheme.colorScheme.onPrimaryContainer
+    
+    // Choose icon based on category rough matching
+    val iconVector = when {
+        transaction.category.contains("Makan", ignoreCase = true) -> Icons.Default.Fastfood
+        transaction.category.contains("Belanja", ignoreCase = true) -> Icons.Default.ShoppingCart
+        transaction.category.contains("Gaji", ignoreCase = true) -> Icons.Default.Payments
+        else -> Icons.Default.Receipt
     }
 
     SiCuanCard(
-        modifier = Modifier.clickable {
-            onClick()
-        }
+        modifier = Modifier.clickable { onClick() }
     ) {
-        Text(
-            text = transaction.title,
-            style = MaterialTheme.typography.titleMedium
-        )
-
-        Text(
-            text = "$amountPrefix${formatCurrency(transaction.amount)}",
-            style = MaterialTheme.typography.titleLarge,
-            color = amountColor
-        )
-
-        Text(
-            text = transaction.category,
-            style = MaterialTheme.typography.bodyMedium
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Icon Container
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(CircleShape)
+                    .background(iconContainerColor),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = iconVector,
+                    contentDescription = null,
+                    tint = iconColor
+                )
+            }
+            
+            Spacer(modifier = Modifier.width(SiCuanDimens.SpacingMd))
+            
+            // Text Content
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = transaction.title,
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = transaction.category,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            
+            // Amount
+            Text(
+                text = "$amountPrefix${formatCurrency(transaction.amount)}",
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                color = amountColor
+            )
+        }
     }
 }
 
-private data class CategorySummary(
-    val category: String,
-    val totalAmount: Double
-)
+
+private data class CategorySummary(val category: String, val totalAmount: Double)
 
 private fun formatCurrency(amount: Double): String {
     val formatter = NumberFormat.getCurrencyInstance(Locale("id", "ID"))
     return formatter.format(amount).replace(",00", "")
+}
+
+@Composable
+private fun GoalCard(title: String, currentAmount: Double, targetAmount: Double) {
+    val progress = if (targetAmount > 0) (currentAmount / targetAmount).toFloat().coerceIn(0f, 1f) else 0f
+    
+    SiCuanCard(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(SiCuanDimens.SpacingSm)
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = formatCurrency(currentAmount),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "dari ${formatCurrency(targetAmount)}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            
+            androidx.compose.material3.LinearProgressIndicator(
+                progress = { progress },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(8.dp)
+                    .clip(CircleShape),
+                color = MaterialTheme.colorScheme.primary,
+                trackColor = MaterialTheme.colorScheme.surfaceVariant
+            )
+            
+            Text(
+                text = "${(progress * 100).toInt()}% tercapai",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.align(Alignment.End)
+            )
+        }
+    }
 }

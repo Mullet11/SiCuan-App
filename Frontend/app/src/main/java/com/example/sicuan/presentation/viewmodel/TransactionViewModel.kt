@@ -232,4 +232,72 @@ class TransactionViewModel(
             )
         }
     }
+
+    fun exportReport() {
+        val currentDate = java.text.SimpleDateFormat("dd MMM yyyy, HH:mm", java.util.Locale("id", "ID")).format(java.util.Date())
+        val state = _uiState.value
+
+        // Build category summaries from expense transactions
+        val expenseTransactions = state.transactions.filter { it.type == com.example.sicuan.domain.model.TransactionType.EXPENSE }
+        val totalExp = state.totalExpense.coerceAtLeast(1.0)
+        val categoryMap = expenseTransactions.groupBy { it.category }
+            .mapValues { entry -> entry.value.sumOf { it.amount } }
+            .entries
+            .sortedByDescending { it.value }
+            .take(5)
+            .map { (cat, amt) ->
+                CategorySummary(
+                    name = cat,
+                    amount = amt,
+                    percentage = ((amt / totalExp) * 100).toFloat()
+                )
+            }
+
+        val newReport = ReportData(
+            id = System.currentTimeMillis(),
+            title = "Laporan Keuangan",
+            subtitle = "$currentDate | PDF & CSV",
+            timestamp = System.currentTimeMillis(),
+            totalIncome = state.totalIncome,
+            totalExpense = state.totalExpense,
+            balance = state.balance,
+            transactionCount = state.transactions.size,
+            topCategories = categoryMap
+        )
+        _uiState.update {
+            it.copy(
+                exportedReports = listOf(newReport) + it.exportedReports,
+                successMessage = "Laporan berhasil ditambahkan"
+            )
+        }
+    }
+
+    fun deleteReport(reportId: Long) {
+        _uiState.update {
+            it.copy(
+                exportedReports = it.exportedReports.filter { r -> r.id != reportId },
+                successMessage = "Laporan berhasil dihapus"
+            )
+        }
+    }
+
+    fun setPrefilledData(
+        amount: String? = null,
+        title: String? = null,
+        note: String? = null,
+        merchant: String? = null,
+        category: String? = null,
+        dateMillis: Long? = null
+    ) {
+        _uiState.update {
+            it.copy(
+                prefilledAmount = amount,
+                prefilledTitle = title,
+                prefilledNote = note,
+                prefilledMerchant = merchant,
+                prefilledCategory = category,
+                prefilledDateMillis = dateMillis
+            )
+        }
+    }
 }

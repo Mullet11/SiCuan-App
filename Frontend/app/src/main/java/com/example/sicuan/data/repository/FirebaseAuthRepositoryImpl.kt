@@ -14,18 +14,28 @@ class FirebaseAuthRepositoryImpl(
         return firebaseAuth.currentUser?.toDomain()
     }
 
-    override suspend fun signInAnonymously(): FirebaseUserInfo {
-        val existingUser = firebaseAuth.currentUser
+    override suspend fun signInWithEmailAndPassword(email: String, password: String): FirebaseUserInfo {
+        val result = firebaseAuth.signInWithEmailAndPassword(email, password).await()
+        val user = result.user ?: throw IllegalStateException("Firebase user tidak ditemukan setelah login")
+        return user.toDomain()
+    }
 
-        if (existingUser != null) {
-            return existingUser.toDomain()
-        }
+    override suspend fun signUpWithEmailAndPassword(email: String, password: String): FirebaseUserInfo {
+        val result = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
+        val user = result.user ?: throw IllegalStateException("Firebase user tidak ditemukan setelah registrasi")
+        return user.toDomain()
+    }
 
-        val result = firebaseAuth.signInAnonymously().await()
-
-        val user = result.user
-            ?: throw IllegalStateException("Firebase user tidak ditemukan setelah anonymous login")
-
+    override suspend fun updateProfile(displayName: String?, photoUrl: String?): FirebaseUserInfo {
+        val user = firebaseAuth.currentUser ?: throw IllegalStateException("Firebase user tidak ditemukan")
+        val profileUpdates = com.google.firebase.auth.UserProfileChangeRequest.Builder()
+            .apply {
+                if (displayName != null) setDisplayName(displayName)
+                if (photoUrl != null) setPhotoUri(android.net.Uri.parse(photoUrl))
+            }
+            .build()
+        
+        user.updateProfile(profileUpdates).await()
         return user.toDomain()
     }
 
@@ -37,7 +47,9 @@ class FirebaseAuthRepositoryImpl(
         return FirebaseUserInfo(
             uid = uid,
             isAnonymous = isAnonymous,
-            email = email
+            email = email,
+            displayName = displayName,
+            photoUrl = photoUrl?.toString()
         )
     }
 }

@@ -12,17 +12,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.example.sicuan.ui.theme.SiCuanDimens
 
+import androidx.compose.ui.graphics.Color
+
 @Composable
 fun SiCuanCard(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(SiCuanDimens.SpacingMd),
+    containerColor: Color = MaterialTheme.colorScheme.surface,
     content: @Composable () -> Unit
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(SiCuanDimens.CardRadius),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = containerColor
         )
     ) {
         Column(
