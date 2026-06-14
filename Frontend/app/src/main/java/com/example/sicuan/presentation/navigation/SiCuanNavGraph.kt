@@ -515,11 +515,6 @@ fun SiCuanNavGraph(
                 )
             }
 
-            composable(Screen.Education.route) {
-                com.example.sicuan.presentation.screen.insight.EducationScreen(
-                    onBack = { navController.popBackStack() }
-                )
-            }
 
             composable(Screen.EditProfile.route) {
                 com.example.sicuan.presentation.screen.profile.EditProfileScreen(

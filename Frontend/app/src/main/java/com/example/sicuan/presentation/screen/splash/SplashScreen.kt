@@ -1,18 +1,14 @@
 package com.example.sicuan.presentation.screen.splash
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.*
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBalanceWallet
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 // Unused imports removed
@@ -40,8 +37,18 @@ fun SplashScreen(
 ) {
     var isLogoVisible by remember { mutableStateOf(false) }
     var isTextVisible by remember { mutableStateOf(false) }
-
     var isButtonVisible by remember { mutableStateOf(false) }
+
+    val infiniteTransition = rememberInfiniteTransition(label = "bounce")
+    val offsetY by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = -30f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 600, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "bounceOffset"
+    )
 
     val context = LocalContext.current
     val mediaPlayer = remember {
@@ -77,25 +84,18 @@ fun SplashScreen(
             visible = isLogoVisible,
             enter = scaleIn(
                 animationSpec = spring(
-                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    dampingRatio = Spring.DampingRatioHighBouncy,
                     stiffness = Spring.StiffnessLow
                 )
             ) + fadeIn(animationSpec = tween(800))
         ) {
-            Box(
+            Image(
+                painter = painterResource(id = R.drawable.logo_sicuan),
+                contentDescription = "Logo SiCuan",
                 modifier = Modifier
-                    .size(120.dp)
-                    .shadow(12.dp, CircleShape)
-                    .background(MaterialTheme.colorScheme.primary, shape = CircleShape),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.AccountBalanceWallet,
-                    contentDescription = "Logo SiCuan",
-                    modifier = Modifier.size(60.dp),
-                    tint = MaterialTheme.colorScheme.onPrimary
-                )
-            }
+                    .size(150.dp)
+                    .offset(y = offsetY.dp)
+            )
         }
         
         Spacer(modifier = Modifier.height(SiCuanDimens.SpacingXl))

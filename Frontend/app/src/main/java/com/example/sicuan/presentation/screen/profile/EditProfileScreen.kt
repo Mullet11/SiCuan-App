@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.Facebook
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -148,15 +149,33 @@ fun EditProfileScreen(
                     modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    AsyncImage(
-                        model = if (isPhotoDeleted) R.drawable.ic_launcher_background else (localPhotoUri ?: photoUrl ?: R.drawable.ic_launcher_background),
-                        contentDescription = "Profile Picture",
-                        modifier = Modifier
-                            .size(70.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.surfaceVariant),
-                        contentScale = ContentScale.Crop
-                    )
+                    val actualModel = if (isPhotoDeleted) null else (localPhotoUri ?: photoUrl)
+                    if (actualModel != null) {
+                        AsyncImage(
+                            model = actualModel,
+                            contentDescription = "Profile Picture",
+                            modifier = Modifier
+                                .size(70.dp)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colorScheme.surfaceVariant),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .size(70.dp)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colorScheme.surfaceVariant),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                Icons.Default.Person,
+                                contentDescription = "Profile Picture",
+                                modifier = Modifier.size(48.dp),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
                 }
                 
                 HorizontalDivider(color = Color.DarkGray, modifier = Modifier.padding(bottom = 8.dp))
@@ -264,18 +283,36 @@ fun EditProfileScreen(
             // Profile Picture Section
             Row(
                 horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.clickable { showPhotoBottomSheet = true }
             ) {
-                AsyncImage(
-                    model = if (isPhotoDeleted) R.drawable.ic_launcher_background else (localPhotoUri ?: photoUrl ?: R.drawable.ic_launcher_background),
-                    contentDescription = "Profile Picture",
-                    modifier = Modifier
-                        .size(80.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.surfaceVariant)
-                        .clickable { showPhotoBottomSheet = true },
-                    contentScale = ContentScale.Crop
-                )
+                val currentModel = if (isPhotoDeleted) null else (localPhotoUri ?: photoUrl)
+                if (currentModel != null) {
+                    AsyncImage(
+                        model = currentModel,
+                        contentDescription = "Profile Picture",
+                        modifier = Modifier
+                            .size(100.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.surfaceVariant),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .size(100.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.surfaceVariant),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            Icons.Default.Person,
+                            contentDescription = "Profile Picture",
+                            modifier = Modifier.size(64.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
             }
             
             Spacer(modifier = Modifier.height(16.dp))
