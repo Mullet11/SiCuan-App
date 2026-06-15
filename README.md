@@ -28,27 +28,42 @@ Aplikasi SiCuan mengintegrasikan berbagai API (baik pihak pertama maupun ketiga)
 ## 3. Struktur Folder
 SiCuan secara ketat mengadopsi pola **Clean Architecture**, memisahkan kode berdasarkan *concern* agar mudah di-*maintain* dan *scalable*.
 ```text
-app/src/main/java/com/example/sicuan/
+com.example.sicuan
+├── data/
+│   ├── local/             # Penyimpanan lokal offline (Room DB)
+│   │   ├── dao/           # Antarmuka query SQL (Insert, Update, Select)
+│   │   ├── database/      # Konfigurasi & Inisialisasi Room Database
+│   │   └── entity/        # Struktur tabel database (Transaction, Plan, dll)
+│   ├── remote/            # Jaringan dan API eksternal
+│   │   ├── api/           # Retrofit client & Endpoint Frankfurter API
+│   │   ├── dto/           # Data Transfer Object (Format mentah dari API)
+│   │   └── firebase/      # Sinkronisasi ke Firestore (Cloud DB)
+│   └── repository/        # Implementasi Single Source of Truth (Lokal vs Cloud)
 │
-├── data/           # Layer Data (Single Source of Truth)
-│   ├── local/      # Implementasi Room Database (DAO, Entity, Database)
-│   ├── remote/     # API Client (Retrofit) & Firebase/Supabase Services
-│   └── repository/ # Implementasi konkret dari Repository (menggabungkan Local & Remote)
+├── domain/
+│   ├── model/             # Kelas data murni aplikasi (Business Logic)
+│   ├── repository/        # Interface/Kontrak abstrak untuk Repository
+│   └── usecase/           # Spesifik 1 tindakan (contoh: GetTransactionsUseCase)
 │
-├── domain/         # Layer Domain (Business Logic Core)
-│   ├── model/      # Data class murni (tidak bergantung pada framework Android)
-│   ├── repository/ # Interface Repository
-│   └── usecase/    # Kumpulan logika bisnis spesifik (misal: GetTransactionsUseCase)
+├── presentation/
+│   ├── component/         # UI "Lego" yang bisa dipakai berulang (Tombol, Card)
+│   ├── navigation/        # Rute NavGraph Jetpack Compose
+│   ├── viewmodel/         # Otak UI (Manajemen State & pemanggil UseCase)
+│   └── screen/            # Tampilan layar UI sebenarnya
+│       ├── budget/
+│       ├── dashboard/
+│       ├── insight/       # Layar edukasi usia & Dunning-Kruger kuis
+│       ├── ocr/           # Fitur scan struk (ML Kit Text Recognition)
+│       ├── profile/
+│       ├── splash/
+│       └── transaction/
 │
-├── presentation/   # Layer UI (Jetpack Compose & MVVM)
-│   ├── component/  # Komponen UI Reusable (Button, Card, TopBar khusus SiCuan)
-│   ├── navigation/ # NavGraph dan Route layar aplikasi
-│   ├── screen/     # Kumpulan UI layar (Home, Edukasi, Transaksi, Profil)
-│   └── viewmodel/  # ViewModel (penghubung UI State dengan Domain Usecase)
-│
-├── di/             # Dependency Injection (Modul injeksi framework)
-├── util/           # Helper, Konstanta, Ekstensi Kotlin (PdfExportHelper, dll)
-└── worker/         # Background Tasks dan Widget
+├── di/                    # Dependency Injection (Modul framework)
+├── util/                  # Kelas Helper yang sudah disatukan (PdfHelper, dll)
+├── worker/                # Background process & Widget aplikasi
+├── ui/
+│   └── theme/             # Warna, Tipografi, dan Tema Jetpack Compose
+└── MainActivity.kt        # Entry point pertama kali aplikasi dibuka
 ```
 ---
 ## 4. Penjelasan Fitur Wajib dan Tambahan (Kriteria UAS)
